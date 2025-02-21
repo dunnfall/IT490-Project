@@ -1,0 +1,55 @@
+<html>
+<script>
+
+function HandleLoginResponse(response)
+{
+    var text = JSON.parse(response);
+//	document.getElementById("textResponse").innerHTML = response+"<p>";	
+    document.getElementById("textResponse").innerHTML = "response: "+text+"<p>";
+}
+
+function SendLoginRequest(identifier, password)
+{
+    var request = new XMLHttpRequest();
+    request.open("POST", "login.php", true);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.onreadystatechange = function ()
+    {
+        if ((this.readyState == 4) && (this.status == 200))
+        {
+            HandleLoginResponse(this.responseText);
+        }		
+    }
+    request.send("type=login&identifier=" + identifier + "&pword=" + password);
+}
+
+function handleSubmit(event) {
+    event.preventDefault();
+    var identifier = document.getElementById("identifier").value;
+    var password = document.getElementById("password").value;
+    SendLoginRequest(identifier, password);
+}
+
+function handleRegister(event) {
+    event.preventDefault();
+    var identifier = document.getElementById("identifier").value;
+    var password = document.getElementById("password").value;
+    SendLoginRequest(identifier, password, "register");
+}
+</script>
+</head>
+<body>
+    <h1>Login Page</h1>
+    <div id="textResponse">awaiting response</div>
+    <form id="loginForm" onsubmit="handleSubmit(event)">
+        <label for="identifier">Username or Email:</label>
+        <input type="text" id="identifier" name="identifier" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+        <button type="button" onclick="handleRegister(event)">Register</button>
+    </form>
+</body>
+</html>
