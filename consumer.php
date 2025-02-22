@@ -4,11 +4,6 @@ require_once "testRabbitMQ.ini";
 
 function processRequest($request)
 {
-    $mysqli = new mysqli("192.168.1.136", "root", "12345", "it490db");
-
-    if ($mysqli->connect_error) {
-        return ["status" => "error", "message" => "Database connection failed: " . $mysqli->connect_error];
-    }
 
     if (!isset($request['action'])) {
         return ["status" => "error", "message" => "Invalid request format."];
