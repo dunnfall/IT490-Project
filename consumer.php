@@ -2,12 +2,12 @@
 require_once "rabbitMQLib.inc";
 require_once "testRabbitMQ.ini";
 
-function processRequest($request)
+function processRequest($request) 
 {
-    $mysqli = new mysqli("192.168.1.136", "root", "12345", "it490db");
+    $mydb = new mysqli('192.168.1.141', 'testUser', '12345', 'it490db');
 
-    if ($mysqli->connect_error) {
-        return ["status" => "error", "message" => "Database connection failed: " . $mysqli->connect_error];
+    if ($mydb->connect_error) {
+        return ["status" => "error", "message" => "Database connection failed: " . $mydb->connect_error];
     }
 
     if (!isset($request['action'])) {
@@ -18,14 +18,25 @@ function processRequest($request)
         case "insert":
             $table = $request['table'];
             $columns = implode(", ", array_keys($request['data']));
-            $values = "'" . implode("', '", array_map([$mysqli, 'real_escape_string'], array_values($request['data']))) . "'";
+            $values = "'" . implode("', '", array_map([$mydb, 'real_escape_string'], array_values($request['data']))) . "'";
 
             $sql = "INSERT INTO $table ($columns) VALUES ($values)";
 
-            if ($mysqli->query($sql) === TRUE) {
+            if ($mydb->query($sql) === TRUE) {
                 return ["status" => "success", "message" => "New record inserted."];
             } else {
-                return ["status" => "error", "message" => $mysqli->error];
+                return ["status" => "error", "message" => $mydb->error];
+            }
+
+        case "select":
+            $table = $request['table'];
+            $sql = "SELECT * FROM $table";
+            $result = $mydb->query($sql);
+            if ($result) {
+                $rows = $result->fetch_all(MYSQLI_ASSOC);
+                return ["status" => "success", "data" => $rows];
+            } else {
+                return ["status" => "error", "message" => $mydb->error];
             }
 
         default:
@@ -33,6 +44,7 @@ function processRequest($request)
     }
 }
 
+// Start Consumer to Listen for Messages
 $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 $server->process_requests("processRequest");
 ?>
