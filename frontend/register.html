@@ -17,7 +17,7 @@
                 message.style.color = 'red';
                 return false;
             }
-            const hashedPassword = CryptoJS.MD5(password).toString();
+            const hashedPassword = CryptoJS.SHA256(password).toString();
             console.log(`Username: ${username}`);
             console.log(`Password: ${hashedPassword}`);
             message.textContent = 'Registration successful!';
@@ -41,6 +41,7 @@
         <input type="password" id="confirmPassword" name="confirmPassword" required>
         <br>
         <button type="submit">Register</button>
+        <button type="button" onclick="window.location.href='index.html'">Login Page</button>
         <p id="message"></p>
     </form>
 </body>
