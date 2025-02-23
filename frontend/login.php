@@ -1,6 +1,6 @@
 <?php
-require_once "rabbitMQLib.inc";
-require_once "testRabbitMQ.ini";
+require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $identifier = $_POST['identifier'];
