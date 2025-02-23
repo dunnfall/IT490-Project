@@ -1,10 +1,11 @@
 <?php
+session_start();
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
 require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $identifier = $_POST['identifier'];
-    $password = $_POST['pword'];
+    $password = $_POST['password'];
 
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
@@ -17,7 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $response = $client->send_request($data);
 
     if ($response['status'] === 'success') {
-        echo "Login successful!";
+        $_SESSION['username'] = $response['username']; // Assuming the response contains the username
+        header("Location: home.html");
+        exit();
     } else {
         echo "Error: " . $response['message'];
     }
