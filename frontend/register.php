@@ -22,7 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $response = $client->send_request($data);
     
     if ($response['status'] === 'success') {
-        echo "Registration successful!";
+        header("Location: login.html?message=registration_successful");
+        exit();
     } else {
         echo "Error: " . $response['message'];
     }

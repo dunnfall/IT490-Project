@@ -1,12 +1,22 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+        .banner {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none; 
+        }
+    </style>
 </head>
 <body>
-    <h1>Login Page</h1>
+    <div id="banner" class="banner">Registration successful!</div>
+    <h1>Login</h1>
     <form action="login.php" method="POST">
         <label for="identifier">Username or Email:</label>
         <input type="text" id="identifier" name="identifier" required>
@@ -17,5 +27,12 @@
         <button type="submit">Login</button>
         <button type="button" onclick="window.location.href='register.html'">Register</button>
     </form>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('message') && urlParams.get('message') === 'registration_successful') {
+            document.getElementById('banner').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
