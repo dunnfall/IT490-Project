@@ -3,6 +3,13 @@ session_start();
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
 require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    if (isset($_SESSION['username'])) {
+        header("Location: home.html");
+        exit();
+    }
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $identifier = $_POST['identifier'];
     $password = $_POST['password'];
