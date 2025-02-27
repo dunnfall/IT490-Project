@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Login</title>
     <style>
         .banner {
@@ -18,16 +19,17 @@
     <div id="banner" class="banner">Registration successful!</div>
     <h1>Login</h1>
     <form action="login.php" method="POST">
-        <label for="identifier">Username or Email:</label>
-        <input type="text" id="identifier" name="identifier" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
+        <label>Username or Email:</label>
+        <input type="text" name="identifier" required><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br>
+
         <button type="submit">Login</button>
         <button type="button" onclick="window.location.href='register.html'">Register</button>
     </form>
 
+    <!-- Optional banner logic for "registration_successful" -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('message') && urlParams.get('message') === 'registration_successful') {

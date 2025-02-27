@@ -1,4 +1,7 @@
 <?php
+// Secure session cookie settings
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
 session_start();
 
 // Check if the user is logged in by verifying the session token
@@ -8,36 +11,31 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-// Debugging: Print session variables
-echo '<pre>';
-print_r($_SESSION);
-echo '</pre>';
+// Store the session username in a variable
+$username = $_SESSION['username'];
+?>
 
-// Store the session and username in variables
+<?php
+// Only if you're on HTTPS:
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+
+session_start();
+
+if (!isset($_SESSION['username'])) {
+    // Not logged in:
+    header("Location: login.html");
+    exit();
+}
+
+// If here, user is logged in
 $username = $_SESSION['username'];
 ?>
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <style>
-        .username {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.2em;
-        }
-    </style>
-</head>
+<html>
+<head><title>Home</title></head>
 <body>
-    <div class="username" id="username">
-        <?php
-        echo "Logged in as: " . htmlspecialchars($username);
-        ?>
-    </div>
-    <h1>Welcome to the Home Page</h1>
-    <!-- Your content here -->
+<h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
+<p>This is protected content.</p>
 </body>
 </html>
