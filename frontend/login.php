@@ -22,18 +22,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $response = $client->send_request($data);
 
-    // Debug:
-    // var_dump($response); exit;
-
     if (isset($response['status']) && $response['status'] === 'success') {
         $_SESSION['username'] = $response['username'] ?? $identifier;
         header("Location: home.php");
         exit();
     } else {
-        // Show error
-        echo "Error: " . ($response['message'] ?? 'Unknown error');
-        // Possibly link back:
-        // echo "<p><a href='login.html'>Return to login page</a></p>";
+        header("Location: login.html?message=login_failed");
+        exit();
     }
 }
 ?>
