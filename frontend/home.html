@@ -14,18 +14,9 @@
     </style>
 </head>
 <body>
-    <div class="username" id="username"></div>
+    <div class="username" id="username">
+    </div>
     <h1>Welcome to the Home Page</h1>
-
-    <script>
-        fetch('get_username.php')
-            .then(response => response.json())
-            .then(data => {
-                if (data.username) {
-                    document.getElementById('username').textContent = `Logged in as: ${data.username}`;
-                }
-            })
-            .catch(error => console.error('Error fetching username:', error));
-    </script>
+    <!-- Your content here -->
 </body>
 </html>
