@@ -38,4 +38,21 @@ $username = $_SESSION['username'];
 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
 <p>This is protected content.</p>
 </body>
+
+<!-- Added Code EAC-->
+<h2>Stock Information</h2>
+<label for="ticker">Enter Stock Ticker:</label>
+<input type="text" id="ticker" value="AAPL">
+<button onclick="fetchStock()">Get Stock Info</button>
+
+<pre id="stockData"></pre>
+
+<script>
+    async function fetchStock() {
+        let ticker = document.getElementById("ticker").value;
+        let response = await fetch("fetch_stock.php?ticker=" + ticker);
+        let data = await response.json();
+        document.getElementById("stockData").innerHTML = JSON.stringify(data, null, 2);
+    }
+</script>
 </html>
