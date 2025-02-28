@@ -1,3 +1,3 @@
 <?php
-define("RAPIDAPI_KEY", "96df71126cmsh0cf9528aa0ebadfp1be970jsn7d4fe55ccc54");
+define("RAPIDAPI_KEY", "c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761");
 ?>

@@ -50,9 +50,20 @@ $username = $_SESSION['username'];
 <script>
     async function fetchStock() {
         let ticker = document.getElementById("ticker").value;
-        let response = await fetch("fetch_stock.php?ticker=" + ticker);
-        let data = await response.json();
-        document.getElementById("stockData").innerHTML = JSON.stringify(data, null, 2);
+        try {
+            let response = await fetch("../API/fetch_stock.php?ticker=" + ticker);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            let data = await response.json();
+            document.getElementById("stockData").innerHTML = JSON.stringify(data, null, 2);
+        } catch (error) {
+            document.getElementById("stockData").innerHTML = 'Error: ' + error.message;
+        }
     }
 </script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 </html>
