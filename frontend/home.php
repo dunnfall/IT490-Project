@@ -34,6 +34,7 @@ $username = $_SESSION['username'];
 <!DOCTYPE html>
 <html>
 <head><title>Home</title></head>
+<?php require(__DIR__ . "/../partials/nav.php"); ?>
 <body>
 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
 <p>This is protected content.</p>
