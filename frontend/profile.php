@@ -49,16 +49,34 @@ $username = $_SESSION['username'];
 
 <script>
     async function fetchStock() {
-        let ticker = document.getElementById("ticker").value;
+        let ticker = document.getElementById("ticker").value.trim().toUpperCase();
+        let stockDataElement = document.getElementById("stockData");
+
+        stockDataElement.innerHTML = "Fetching stock data...";
+
         try {
-            let response = await fetch("../API/fetch_stock.php?ticker=" + ticker);
+            let response = await fetch("../API/fetch_stock.php?ticker=" + ticker, {
+                method: "GET"
+            });
+
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error("Network response was not ok");
             }
+
             let data = await response.json();
-            document.getElementById("stockData").innerHTML = JSON.stringify(data, null, 2);
+
+            if (data.error) {
+                stockDataElement.innerHTML = <strong>Error:</strong> ${data.error};
+            } else {
+                stockDataElement.innerHTML = 
+                    <strong>Ticker:</strong> ${data.ticker} <br>
+                    <strong>Company:</strong> ${data.company} <br>
+                    <strong>Price:</strong> $${parseFloat(data.price).toFixed(2)} <br>
+                    <strong>Timestamp:</strong> ${data.timestamp}
+                ;
+            }
         } catch (error) {
-            document.getElementById("stockData").innerHTML = 'Error: ' + error.message;
+            stockDataElement.innerHTML = <strong>Error:</strong> ${error.message};
         }
     }
 </script>

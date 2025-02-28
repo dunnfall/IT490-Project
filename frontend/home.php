@@ -4,7 +4,26 @@ $username = $_SESSION['username'];
 ?>
 <!DOCTYPE html>
 <html>
-<head><title>Home</title></head>
+<head>
+    <title>Home</title>
+    <script>
+        function fetchStock() {
+            const ticker = document.getElementById('ticker').value;
+            fetch(`fetch_stock.php?ticker=${ticker}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('stockData').textContent = `Error: ${data.error}`;
+                    } else {
+                        document.getElementById('stockData').textContent = JSON.stringify(data, null, 2);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('stockData').textContent = `Fetch error: ${error}`;
+                });
+        }
+    </script>
+</head>
 <body>
 <?php require(__DIR__ . "/../partials/nav.php"); ?>
 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
@@ -17,22 +36,5 @@ $username = $_SESSION['username'];
 <button onclick="fetchStock()">Get Stock Info</button>
 
 <pre id="stockData"></pre>
-
-<script>
-    async function fetchStock() {
-        let ticker = document.getElementById("ticker").value;
-        try {
-            let response = await fetch("../API/fetch_stock.php?ticker=" + ticker);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            let data = await response.json();
-            document.getElementById("stockData").innerHTML = JSON.stringify(data, null, 2);
-        } catch (error) {
-            document.getElementById("stockData").innerHTML = 'Error: ' + error.message;
-            console.error('Error fetching stock data:', error);
-        }
-    }
-</script>
+</body>
 </html>
-?>
