@@ -20,7 +20,6 @@ $username = $_SESSION['username'];
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
 
-session_start();
 
 if (!isset($_SESSION['username'])) {
     // Not logged in:
