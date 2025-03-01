@@ -42,7 +42,7 @@ $username = $_SESSION['username'];
 <!-- Added Code EAC-->
 <h2>Stock Information</h2>
 <label for="ticker">Enter Stock Ticker:</label>
-<input type="text" id="ticker" value="AAPL">
+<input type="text" id="ticker" value="">
 <button onclick="fetchStock()">Get Stock Info</button>
 
 <pre id="stockData"></pre>
