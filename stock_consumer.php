@@ -4,6 +4,8 @@ require_once "testRabbitMQ.ini";
 
 function processRequest($request)
 {
+    error_log("Received request: " . print_r($request, true));
+
     // Establish database connection
     $mydb = new mysqli("192.168.1.142", "testUser", "12345", "it490db");
 
@@ -17,10 +19,11 @@ function processRequest($request)
         return ["status" => "error", "message" => "Invalid request format."];
     }
 
-    switch ($request['action']) {
+    $action = trim($request['action']);
+
+    switch ($action) {
         case "store_stock":
-            // Ensure data has the required fields
-            if (!isset($request['data']['ticker']) || !isset($request['data']['company']) || !isset($request['data']['price']) || !isset($request['data']['timestamp'])) {
+            if (!isset($request['data']['ticker'], $request['data']['company'], $request['data']['price'], $request['data']['timestamp'])) {
                 return ["status" => "error", "message" => "Missing required stock data fields."];
             }
 
@@ -28,7 +31,7 @@ function processRequest($request)
             $company = trim($request['data']['company']);
             $price = floatval($request['data']['price']);
             $timestamp = date("Y-m-d H:i:s", intval($request['data']['timestamp']));
-            $table = "stocks"; // Assuming stocks table
+            $table = "stocks";
 
             // Check if stock already exists
             $checkQuery = "SELECT id FROM $table WHERE ticker = ?";
@@ -58,44 +61,43 @@ function processRequest($request)
                 return ["status" => "error", "message" => "Ticker not provided"];
             }
 
-    $ticker = strtoupper(trim($request['data']['ticker']));
-    error_log("Checking database for stock: " . $ticker);
+            $ticker = strtoupper(trim($request['data']['ticker']));
+            error_log("Checking database for stock: " . $ticker);
 
-    $query = "SELECT ticker, company, price, timestamp FROM stocks WHERE ticker = ?";
-    $stmt = $mydb->prepare($query);
-    if (!$stmt) {
-        error_log("Prepare statement failed: " . $mydb->error);
-        return ["status" => "error", "message" => "Database query preparation failed"];
-    }
+            $query = "SELECT ticker, company, price, timestamp FROM stocks WHERE ticker = ?";
+            $stmt = $mydb->prepare($query);
+            if (!$stmt) {
+                error_log("Prepare statement failed: " . $mydb->error);
+                return ["status" => "error", "message" => "Database query preparation failed"];
+            }
 
-    $stmt->bind_param("s", $ticker);
-    if (!$stmt->execute()) {
-        error_log("Query execution failed: " . $stmt->error);
-        return ["status" => "error", "message" => "Query execution failed"];
-    }
+            $stmt->bind_param("s", $ticker);
+            if (!$stmt->execute()) {
+                error_log("Query execution failed: " . $stmt->error);
+                return ["status" => "error", "message" => "Query execution failed"];
+            }
 
-    $result = $stmt->get_result();
-    if (!$result) {
-        error_log("Query result retrieval failed: " . $mydb->error);
-        return ["status" => "error", "message" => "Query result retrieval failed"];
-    }
+            $result = $stmt->get_result();
+            if (!$result) {
+                error_log("Query result retrieval failed: " . $mydb->error);
+                return ["status" => "error", "message" => "Query result retrieval failed"];
+            }
 
-    if ($result->num_rows > 0) {
-        $stockData = $result->fetch_assoc();
-        error_log("Stock found: " . print_r($stockData, true));
-        return ["status" => "success", "data" => $stockData];
-    } else {
-        error_log("Stock not found in DB");
-        return ["status" => "error", "message" => "Stock not found"];
-    }
+            if ($result->num_rows > 0) {
+                $stockData = $result->fetch_assoc();
+                error_log("Stock found: " . print_r($stockData, true));
+                return ["status" => "success", "data" => $stockData];
+            } else {
+                error_log("Stock not found in DB");
+                return ["status" => "error", "message" => "Stock not found"];
+            }
 
         default:
-            return ["status" => "error", "message" => "Unknown action: " . $request['action']];
+            error_log("Unknown action received: '" . $action . "'");
+            return ["status" => "error", "message" => "Unknown action: " . $action];
     }
-    error_log("Received request: " . print_r($request, true));
 }
 
 // Set up RabbitMQ server to process requests
 $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 $server->process_requests("processRequest");
-
