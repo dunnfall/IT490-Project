@@ -54,9 +54,9 @@ function processRequest($request)
             }
 
         case "get_stock":
-    if (!isset($request['data']['ticker'])) {
-        return ["status" => "error", "message" => "Ticker not provided"];
-    }
+            if (!isset($request['data']['ticker'])) {
+                return ["status" => "error", "message" => "Ticker not provided"];
+            }
 
     $ticker = strtoupper(trim($request['data']['ticker']));
     error_log("Checking database for stock: " . $ticker);
@@ -92,6 +92,7 @@ function processRequest($request)
         default:
             return ["status" => "error", "message" => "Unknown action: " . $request['action']];
     }
+    error_log("Received request: " . print_r($request, true));
 }
 
 // Set up RabbitMQ server to process requests
