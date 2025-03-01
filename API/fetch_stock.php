@@ -8,7 +8,8 @@ ini_set('display_errors', 1);
 
 function getStockData($ticker) {
     $apiKey = 'c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761'; // Replace with your actual API key
-    $apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/modules?ticker=$ticker&module=asset-profile"; // Replace with the actual API URL
+    // Append the URL-encoded ticker to the base URL
+    $apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=" . urlencode($ticker);
 
     $curl = curl_init();
 
@@ -61,12 +62,24 @@ if (isset($_GET['ticker'])) {
     // Log the stock data for debugging
     error_log("Stock Data: " . print_r($stock_data, true));
 
-    if ($stock_data && isset($stock_data['price'])) {
-        $company = $stock_data['company'];
-        $price = $stock_data['price'];
+    // Filter the search results for the exact ticker match
+    $foundStock = null;
+    if ($stock_data && isset($stock_data['body']) && is_array($stock_data['body'])) {
+        foreach ($stock_data['body'] as $stock) {
+            if (isset($stock['symbol']) && strcasecmp($stock['symbol'], $ticker) === 0) {
+                $foundStock = $stock;
+                break;
+            }
+        }
+    }
+
+    if ($foundStock) {
+        // Example: extract the company name and the last sale price
+        $company = $foundStock['displayName'];
+        $price   = $foundStock['regularMarketOpen'];
         $timestamp = time();
 
-        $data = [
+        $dataToStore = [
             'action' => 'store_stock',
             'data' => [
                 'ticker' => $ticker,
@@ -78,10 +91,10 @@ if (isset($_GET['ticker'])) {
 
         // Send the request to RabbitMQ
         $client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
-        $response = $client->send_request($data);
+        $response = $client->send_request($dataToStore);
 
         // Handle Response
-        if ($response['status'] === 'success') {
+        if (isset($response['status']) && $response['status'] === 'success') {
             echo json_encode([
                 'ticker' => $ticker,
                 'company' => $company,
@@ -96,7 +109,7 @@ if (isset($_GET['ticker'])) {
             ]);
         }
     } else {
-        echo json_encode(['error' => 'Failed to fetch stock data']);
+        echo json_encode(['error' => 'Ticker not found in the API response']);
     }
 } else {
     echo json_encode(['error' => 'Ticker not provided']);
