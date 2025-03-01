@@ -14,13 +14,20 @@ function getStockDataFromDB($ticker) {
         'data' => ['ticker' => $ticker]
     ];
 
+    error_log("Sending request to RabbitMQ to fetch stock data from DB: " . print_r($request, true));
+
     $response = $client->send_request($request);
+
+    error_log("Received response from RabbitMQ: " . print_r($response, true));
+
     return $response;
 }
 
 function getStockDataFromAPI($ticker) {
     $apiKey = 'c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761';
     $apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=" . urlencode($ticker);
+
+    error_log("Fetching stock data from API: " . $apiUrl);
 
     $curl = curl_init();
     curl_setopt_array($curl, [
@@ -37,7 +44,7 @@ function getStockDataFromAPI($ticker) {
     curl_close($curl);
 
     if ($err) {
-        error_log("cURL Error #: $err");
+        error_log("cURL Error: " . $err);
         return null;
     }
 
@@ -53,19 +60,24 @@ function getStockDataFromAPI($ticker) {
 
 if (isset($_GET['ticker'])) {
     $ticker = strtoupper(trim($_GET['ticker']));
+    error_log("Processing stock request for ticker: " . $ticker);
 
-    // First, try to fetch stock data from the database
+    // check the database for existing stock data
     $storedStock = getStockDataFromDB($ticker);
 
     if ($storedStock && isset($storedStock['status']) && $storedStock['status'] === 'success') {
+        error_log("Stock found in database: " . print_r($storedStock, true));
         echo json_encode($storedStock['data']);
         exit();
+    } else {
+        error_log("Stock NOT found in database, fetching from API...");
     }
 
-    // eac look to see if its in db
+    //If not found fetch from API
     $stock_data = getStockDataFromAPI($ticker);
 
     if (!$stock_data || !isset($stock_data['body']) || empty($stock_data['body'])) {
+        error_log("Stock not found in API response.");
         echo json_encode(['error' => 'Ticker not found in the API response']);
         exit();
     }
@@ -83,6 +95,8 @@ if (isset($_GET['ticker'])) {
         $price = $foundStock['regularMarketOpen'] ?? 0;
         $timestamp = time();
 
+        error_log("Stock data fetched from API: " . print_r($foundStock, true));
+
         $dataToStore = [
             'action' => 'store_stock',
             'data' => [
@@ -93,9 +107,10 @@ if (isset($_GET['ticker'])) {
             ]
         ];
 
-        // Send data to RabbitMQ
+        //Send data to RabbitMQ
         $client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
         $client->send_request($dataToStore);
+        error_log("Sent stock data to RabbitMQ for storage.");
 
         echo json_encode([
             'ticker' => $ticker,
@@ -105,9 +120,11 @@ if (isset($_GET['ticker'])) {
             'message' => 'Stock data retrieved successfully'
         ]);
     } else {
+        error_log("Final error: Stock not found in API response.");
         echo json_encode(['error' => 'Ticker not found in the API response']);
     }
 } else {
+    error_log("Error: No ticker provided in request.");
     echo json_encode(['error' => 'Ticker not provided']);
 }
 ?>

@@ -52,25 +52,42 @@ function processRequest($request)
                 error_log("Database insert error: " . $stmt->error);
                 return ["status" => "error", "message" => "Database insert failed."];
             }
-            
+
         case "get_stock":
-                if (!isset($request['data']['ticker'])) {
-                    return ["status" => "error", "message" => "Ticker not provided"];
-                }
-            
-                $ticker = strtoupper(trim($request['data']['ticker']));
-                $query = "SELECT ticker, company, price, timestamp FROM stocks WHERE ticker = ?";
-                $stmt = $mydb->prepare($query);
-                $stmt->bind_param("s", $ticker);
-                $stmt->execute();
-                $result = $stmt->get_result();
-            
-                if ($result->num_rows > 0) {
-                    return ["status" => "success", "data" => $result->fetch_assoc()];
-                } else {
-                    return ["status" => "error", "message" => "Stock not found"];
-                }
-            
+    if (!isset($request['data']['ticker'])) {
+        return ["status" => "error", "message" => "Ticker not provided"];
+    }
+
+    $ticker = strtoupper(trim($request['data']['ticker']));
+    error_log("Checking database for stock: " . $ticker);
+
+    $query = "SELECT ticker, company, price, timestamp FROM stocks WHERE ticker = ?";
+    $stmt = $mydb->prepare($query);
+    if (!$stmt) {
+        error_log("Prepare statement failed: " . $mydb->error);
+        return ["status" => "error", "message" => "Database query preparation failed"];
+    }
+
+    $stmt->bind_param("s", $ticker);
+    if (!$stmt->execute()) {
+        error_log("Query execution failed: " . $stmt->error);
+        return ["status" => "error", "message" => "Query execution failed"];
+    }
+
+    $result = $stmt->get_result();
+    if (!$result) {
+        error_log("Query result retrieval failed: " . $mydb->error);
+        return ["status" => "error", "message" => "Query result retrieval failed"];
+    }
+
+    if ($result->num_rows > 0) {
+        $stockData = $result->fetch_assoc();
+        error_log("Stock found: " . print_r($stockData, true));
+        return ["status" => "success", "data" => $stockData];
+    } else {
+        error_log("Stock not found in DB");
+        return ["status" => "error", "message" => "Stock not found"];
+    }
 
         default:
             return ["status" => "error", "message" => "Unknown action: " . $request['action']];
