@@ -45,22 +45,44 @@ $username = $_SESSION['username'];
 <input type="text" id="ticker" value="">
 <button onclick="fetchStock()">Get Stock Info</button>
 
-<pre id="stockData"></pre>
+<table id="stockTable" border="1" style="margin-top:10px; display:none;">
+    <tr><th>Ticker</th><th>Company</th><th>Price</th><th>Last Updated</th></tr>
+    <tr id="stockRow"></tr>
+</table>
+
+<p id="errorMessage" style="color: red;"></p>
 
 <script>
-    async function fetchStock() {
-        let ticker = document.getElementById("ticker").value;
-        try {
-            let response = await fetch("../API/fetch_stock.php?ticker=" + ticker);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            let data = await response.json();
-            document.getElementById("stockData").innerHTML = JSON.stringify(data, null, 2);
-        } catch (error) {
-            document.getElementById("stockData").innerHTML = 'Error: ' + error.message;
-        }
+async function fetchStock() {
+    let ticker = document.getElementById("ticker").value.trim();
+    if (!ticker) {
+        document.getElementById("errorMessage").textContent = "Please enter a valid ticker.";
+        return;
     }
+
+    try {
+        let response = await fetch("../API/fetch_stock.php?ticker=" + ticker);
+        let data = await response.json();
+
+        if (data.error) {
+            document.getElementById("errorMessage").textContent = data.error;
+            document.getElementById("stockTable").style.display = "none";
+            return;
+        }
+
+        document.getElementById("errorMessage").textContent = "";
+        document.getElementById("stockTable").style.display = "table";
+
+        let row = document.getElementById("stockRow");
+        row.innerHTML = `<td>${data.ticker}</td>
+                         <td>${data.company}</td>
+                         <td>$${data.price.toFixed(2)}</td>
+                         <td>${data.timestamp}</td>`;
+    } catch (error) {
+        document.getElementById("errorMessage").textContent = "Error fetching stock data.";
+        document.getElementById("stockTable").style.display = "none";
+    }
+}
 </script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

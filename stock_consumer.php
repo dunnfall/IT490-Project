@@ -52,6 +52,25 @@ function processRequest($request)
                 error_log("Database insert error: " . $stmt->error);
                 return ["status" => "error", "message" => "Database insert failed."];
             }
+            
+        case "get_stock":
+                if (!isset($request['data']['ticker'])) {
+                    return ["status" => "error", "message" => "Ticker not provided"];
+                }
+            
+                $ticker = strtoupper(trim($request['data']['ticker']));
+                $query = "SELECT ticker, company, price, timestamp FROM stocks WHERE ticker = ?";
+                $stmt = $mydb->prepare($query);
+                $stmt->bind_param("s", $ticker);
+                $stmt->execute();
+                $result = $stmt->get_result();
+            
+                if ($result->num_rows > 0) {
+                    return ["status" => "success", "data" => $result->fetch_assoc()];
+                } else {
+                    return ["status" => "error", "message" => "Stock not found"];
+                }
+            
 
         default:
             return ["status" => "error", "message" => "Unknown action: " . $request['action']];
