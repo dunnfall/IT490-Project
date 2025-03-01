@@ -27,7 +27,7 @@ function processRequest($request)
             $ticker = strtoupper(trim($request['data']['ticker']));
             $company = trim($request['data']['company']);
             $price = floatval($request['data']['price']);
-            $timestamp = trim($request['data']['timestamp']);
+            $timestamp = date("Y-m-d H:i:s", intval($request['data']['timestamp']));
             $table = "stocks"; // Assuming stocks table
 
             // Check if stock already exists
