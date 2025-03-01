@@ -61,4 +61,4 @@ function processRequest($request)
 // Set up RabbitMQ server to process requests
 $server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
 $server->process_requests("processRequest");
-?>
+
