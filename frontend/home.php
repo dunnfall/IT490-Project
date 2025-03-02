@@ -70,56 +70,74 @@ $username = $_SESSION['username'];
 
                     console.log("Stock added to database, waiting for update...");
                     await new Promise(resolve => setTimeout(resolve, 2000));
-                } else {
-                    console.log("Stock found in database. Updating latest price...");
-                    await fetch(`../API/update_stock.php?ticker=${ticker}`);
                 }
 
-                // Retry fetching stock data after update
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
-                data = await response.json();
-
-                if (data.error) {
-                    errorMessage.textContent = "Stock data not available.";
-                    return;
-                }
-
-                errorMessage.textContent = "";
-                stockTable.style.display = "table";
-
-                let price = parseFloat(data.price);
-
-                row.innerHTML = `<td>${data.ticker}</td>
-                                 <td>${data.company}</td>
-                                 <td>$${!isNaN(price) ? price.toFixed(2) : "N/A"}</td>
-                                 <td>${data.timestamp}</td>`;
+                // Now fetch the stock from the database after update
+                await getStock();
             } catch (error) {
                 console.error("Fetch Error:", error);
                 errorMessage.textContent = "Error fetching stock data.";
                 stockTable.style.display = "none";
             }
         }
+
+        async function getStock() {
+    let ticker = document.getElementById("ticker2").value.trim().toUpperCase();
+    let errorMessage = document.getElementById("errorMessage");
+    let stockTable = document.getElementById("stockTable");
+    let row = document.getElementById("stockRow");
+
+    if (!ticker) {
+        errorMessage.textContent = "Please enter a valid ticker.";
+        return;
+    }
+
+    errorMessage.textContent = "Fetching stock data...";
+    stockTable.style.display = "none";
+
+    try {
+        let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
+        let data = await response.json();
+
+        if (data.error) {
+            errorMessage.textContent = "Stock not found.";
+            return;
+        }
+
+        errorMessage.textContent = "";
+        stockTable.style.display = "table";
+
+        row.innerHTML = `<td>${data.ticker}</td>
+                         <td>${data.company}</td>
+                         <td>$${parseFloat(data.price).toFixed(2)}</td>
+                         <td>${data.timestamp}</td>`;
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        errorMessage.textContent = "Error fetching stock data.";
+        stockTable.style.display = "none";
+    }
+}
     </script>
 </head>
 <body>
     <div style="margin-top:10px;">
-        <h2>Welcome, <?php echo $username; ?>!</h2>
+        <h2>Welcome, <?php echo htmlspecialchars($username); ?>!</h2>
         <a href="logout.php">Logout</a>
     </div>
+    
     <div>
         <h2>Fetch Stock Data From API</h2>
         <label for="ticker">Enter Stock Ticker:</label>
         <input type="text" id="ticker">
         <button onclick="fetchStock()">Get Stock Info</button>
     </div>
+
     <div>
-    <h2>Display Stock Information</h2>
-    <label for="ticker">Enter Stock Ticker:</label>
-    <input type="text" id="ticker">
-    <button onclick="fetchStock()">Display Stock</button>
+        <h2>Display Stock Information</h2>
+        <label for="ticker">Enter Stock Ticker:</label>
+        <input type="text" id="ticker2">
+        <button onclick="getStock()">Display Stock</button>
     </div>
-    
 
     <table id="stockTable" border="1" style="margin-top:10px; display:none;">
         <tr><th>Ticker</th><th>Company</th><th>Price</th><th>Last Updated</th></tr>
