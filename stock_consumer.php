@@ -33,7 +33,7 @@ function processRequest($request)
             $timestamp = date("Y-m-d H:i:s", strtotime($request['data']['timestamp']));
             $table = "stocks";
         
-            //Check if stock already exists
+            // Check if stock already exists
             $checkQuery = "SELECT id FROM $table WHERE ticker = ?";
             $stmt = $mydb->prepare($checkQuery);
             $stmt->bind_param("s", $ticker);
@@ -41,7 +41,7 @@ function processRequest($request)
             $result = $stmt->get_result();
         
             if ($result->num_rows > 0) {
-                //If stock exists, update it instead of inserting a duplicate
+                // ✅ If stock exists, update it
                 $updateQuery = "UPDATE $table SET price = ?, timestamp = ? WHERE ticker = ?";
                 $stmt = $mydb->prepare($updateQuery);
                 $stmt->bind_param("dss", $price, $timestamp, $ticker);
@@ -53,7 +53,7 @@ function processRequest($request)
                     return ["status" => "error", "message" => "Stock update failed."];
                 }
             } else {
-                // 🔹 If stock doesn't exist, insert it
+                // ✅ If stock doesn't exist, insert it
                 $insertQuery = "INSERT INTO $table (ticker, company, price, timestamp) VALUES (?, ?, ?, ?)";
                 $stmt = $mydb->prepare($insertQuery);
                 $stmt->bind_param("ssds", $ticker, $company, $price, $timestamp);
@@ -64,7 +64,7 @@ function processRequest($request)
                     error_log("Database insert error: " . $stmt->error);
                     return ["status" => "error", "message" => "Database insert failed."];
                 }
-            }        
+            }
 
             case "get_stock":
                 if (!isset($request['data']['ticker'])) {
