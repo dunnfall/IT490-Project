@@ -20,7 +20,7 @@ function getStockDataFromAPI($ticker) {
     $apiKey = 'c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761';
     $apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=" . urlencode($ticker);
 
-    error_log("Fetching stock data from API: " . $apiUrl);
+    error_log("📡 Fetching stock data from API: " . $apiUrl);
 
     $curl = curl_init();
     curl_setopt_array($curl, [
@@ -48,7 +48,7 @@ function getStockDataFromAPI($ticker) {
 $stockData = getStockDataFromAPI($ticker);
 
 if (!$stockData || !isset($stockData['body']) || empty($stockData['body'])) {
-    error_log(" Stock not found in API response.");
+    error_log("Stock not found in API response.");
     echo json_encode(['error' => 'Ticker not found in the API response']);
     exit();
 }
@@ -60,6 +60,12 @@ if ($foundStock) {
     $company = $foundStock['displayName'] ?? 'N/A';
     $price = floatval($foundStock['regularMarketOpen'] ?? 0);
     $timestamp = date("Y-m-d H:i:s");
+    $weekChange = $foundStock['fiftyTwoWeekChange'] ?? null;
+    $weekHigh = $foundStock['fiftyTwoWeekHigh'] ?? null;
+    $weekLow = $foundStock['fiftyTwoWeekLow'] ?? null;
+    $marketCap = $foundStock['marketCap'] ?? null;
+    $region = $foundStock['region'] ?? 'N/A';
+    $currency = $foundStock['currency'] ?? 'N/A';
 
     // Store or update stock in DB via RabbitMQ
     $dataToStore = [
@@ -68,11 +74,29 @@ if ($foundStock) {
             'ticker' => $ticker,
             'company' => $company,
             'price' => $price,
-            'timestamp' => $timestamp
+            'timestamp' => $timestamp,
+            '52weekchange' => $weekChange,
+            '52weekhigh' => $weekHigh,
+            '52weeklow' => $weekLow,
+            'marketcap' => $marketCap,
+            'region' => $region,
+            'currency' => $currency
         ]
     ];
 
     $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-    $client->send_request($dataToStore);
+    
+    // Store the response in a variable
+    $response = $client->send_request($dataToStore);
+
+    // Now, we can properly check if the store operation was successful
+    if (!$response || !isset($response['status']) || $response['status'] !== 'success') {
+        error_log("Stock store failed via RabbitMQ. Response: " . print_r($response, true));
+        echo json_encode(['error' => 'Failed to store stock in database.']);
+        exit();
+    }
+
+    // If stock is stored successfully, return a success message
+    echo json_encode(['success' => 'Stock successfully added to database.']);
+    exit();
 }
-exit();
