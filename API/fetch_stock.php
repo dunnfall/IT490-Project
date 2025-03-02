@@ -60,6 +60,12 @@ if ($foundStock) {
     $company = $foundStock['displayName'] ?? 'N/A';
     $price = floatval($foundStock['regularMarketOpen'] ?? 0);
     $timestamp = date("Y-m-d H:i:s");
+    $weekChange = $foundStock['fiftyTwoWeekChange'] ?? null;
+    $weekHigh = $foundStock['fiftyTwoWeekHigh'] ?? null;
+    $weekLow = $foundStock['fiftyTwoWeekLow'] ?? null;
+    $marketCap = $foundStock['marketCap'] ?? null;
+    $region = $foundStock['region'] ?? 'N/A';
+    $currency = $foundStock['currency'] ?? 'N/A';
 
     // Store or update stock in DB via RabbitMQ
     $dataToStore = [
@@ -68,7 +74,13 @@ if ($foundStock) {
             'ticker' => $ticker,
             'company' => $company,
             'price' => $price,
-            'timestamp' => $timestamp
+            'timestamp' => $timestamp,
+            '52weekchange' => $weekChange,
+            '52weekhigh' => $weekHigh,
+            '52weeklow' => $weekLow,
+            'marketcap' => $marketCap,
+            'region' => $region,
+            'currency' => $currency
         ]
     ];
 
