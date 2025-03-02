@@ -3,43 +3,73 @@
 <head>
     <title>Stock Information</title>
     <script>
-        async function fetchStock() {
-            let ticker = document.getElementById("ticker").value.trim().toUpperCase();
-            if (!ticker) {
-                document.getElementById("errorMessage").textContent = "Please enter a valid ticker.";
+       async function fetchStock() {
+    let ticker = document.getElementById("ticker").value.trim().toUpperCase();
+    let errorMessage = document.getElementById("errorMessage");
+    let stockTable = document.getElementById("stockTable");
+    let row = document.getElementById("stockRow");
+
+    if (!ticker) {
+        errorMessage.textContent = "Please enter a valid ticker.";
+        return;
+    }
+
+    errorMessage.textContent = "Fetching latest stock data...";
+    stockTable.style.display = "none";
+
+    try {
+        //Fetch latest stock data from API & store in DB
+        console.log("Fetching latest stock data from API...");
+        let fetchResponse = await fetch(`../API/fetch_stock.php?ticker=${ticker}`);
+
+        if (!fetchResponse.ok) {
+            errorMessage.textContent = "Failed to fetch stock from API.";
+            return;
+        }
+
+        //Wait a moment for DB update
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2-second delay
+
+        // Retrieve latest stock from database
+        console.log(" Retrieving latest stock from database...");
+        
+        try {
+            let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
+            let text = await response.text(); // Get raw response
+            console.log(" Raw API Response:", text); // Debugging raw output
+
+            let data = JSON.parse(text); // Try parsing as JSON
+            console.log(" Parsed API Response:", data); // Debugging parsed JSON
+
+            if (data.error) {
+                errorMessage.textContent = "Stock data not available.";
                 return;
             }
 
-            try {
-                let response = await fetch("../API/fetch_stock.php?ticker=" + ticker);
-                let data = await response.json();
+            //  Display updated stock data
+            errorMessage.textContent = "";
+            stockTable.style.display = "table";
 
-                console.log("API Response:", data);
+            let price = parseFloat(data.price);
 
-                if (data.error) {
-                    document.getElementById("errorMessage").textContent = data.error;
-                    document.getElementById("stockTable").style.display = "none";
-                    return;
-                }
+            row.innerHTML = `<td>${data.ticker}</td>
+                             <td>${data.company}</td>
+                             <td>$${!isNaN(price) ? price.toFixed(2) : "N/A"}</td>
+                             <td>${data.timestamp}</td>`;
 
-                document.getElementById("errorMessage").textContent = "";
-                document.getElementById("stockTable").style.display = "table";
-
-                let row = document.getElementById("stockRow");
-
-                // Converted to float for proper formatting
-                let price = parseFloat(data.price);
-
-                row.innerHTML = `<td>${data.ticker}</td>
-                                 <td>${data.company}</td>
-                                 <td>$${!isNaN(price) ? price.toFixed(2) : "N/A"}</td>
-                                 <td>${data.timestamp}</td>`;
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                document.getElementById("errorMessage").textContent = "Error fetching stock data.";
-                document.getElementById("stockTable").style.display = "none";
-            }
+        } catch (jsonError) {
+            console.error("JSON Parse Error:", jsonError);
+            errorMessage.textContent = "Error processing stock data.";
+            stockTable.style.display = "none";
         }
+
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        errorMessage.textContent = "Error fetching stock data.";
+        stockTable.style.display = "none";
+    }
+}
+
     </script>
 </head>
 <body>
