@@ -16,11 +16,11 @@ if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
 
 $ticker = strtoupper(trim($_GET['ticker']));
 
-function getStockDataFromAPI($ticker) {
+function getStock($ticker) {
     $apiKey = 'c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761';
     $apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=" . urlencode($ticker);
 
-    error_log("📡 Fetching stock data from API: " . $apiUrl);
+    error_log("Fetching stock data from API: " . $apiUrl);
 
     $curl = curl_init();
     curl_setopt_array($curl, [
@@ -45,7 +45,7 @@ function getStockDataFromAPI($ticker) {
 }
 
 // Fetch from API
-$stockData = getStockDataFromAPI($ticker);
+$stockData = getStock($ticker);
 
 if (!$stockData || !isset($stockData['body']) || empty($stockData['body'])) {
     error_log("Stock not found in API response.");
@@ -60,7 +60,7 @@ if ($foundStock) {
     $company = $foundStock['displayName'] ?? 'N/A';
     $price = floatval($foundStock['regularMarketOpen'] ?? 0);
     $timestamp = date("Y-m-d H:i:s");
-    $weekChange = $foundStock['fiftyTwoWeekChange'] ?? null;
+    $weekChange = $foundStock['fiftyTwoWeekChangePercent'] ?? null;
     $weekHigh = $foundStock['fiftyTwoWeekHigh'] ?? null;
     $weekLow = $foundStock['fiftyTwoWeekLow'] ?? null;
     $marketCap = $foundStock['marketCap'] ?? null;
@@ -75,7 +75,7 @@ if ($foundStock) {
             'company' => $company,
             'price' => $price,
             'timestamp' => $timestamp,
-            '52weekchange' => $weekChange,
+            '52weekchangepercent' => $weekChange,
             '52weekhigh' => $weekHigh,
             '52weeklow' => $weekLow,
             'marketcap' => $marketCap,
