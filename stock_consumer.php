@@ -26,72 +26,67 @@ function processRequest($request)
             if (!isset($request['data']['ticker'], $request['data']['company'], $request['data']['price'], $request['data']['timestamp'])) {
                 return ["status" => "error", "message" => "Missing required stock data fields."];
             }
-
+        
             $ticker = strtoupper(trim($request['data']['ticker']));
             $company = trim($request['data']['company']);
             $price = floatval($request['data']['price']);
             $timestamp = date("Y-m-d H:i:s", intval($request['data']['timestamp']));
             $table = "stocks";
-
-            // Check if stock already exists
-            $checkQuery = "SELECT id FROM $table WHERE ticker = ?";
-            $stmt = $mydb->prepare($checkQuery);
-            $stmt->bind_param("s", $ticker);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                return ["status" => "error", "message" => "Stock already exists in database."];
-            }
-
-            // Insert stock data safely using prepared statements
-            $insertQuery = "INSERT INTO $table (ticker, company, price, timestamp) VALUES (?, ?, ?, ?)";
-            $stmt = $mydb->prepare($insertQuery);
+        
+            //Always update stock if it exists
+            $updateQuery = "INSERT INTO $table (ticker, company, price, timestamp)
+                            VALUES (?, ?, ?, ?)
+                            ON DUPLICATE KEY UPDATE 
+                            company = VALUES(company), 
+                            price = VALUES(price), 
+                            timestamp = VALUES(timestamp)";
+            $stmt = $mydb->prepare($updateQuery);
             $stmt->bind_param("ssds", $ticker, $company, $price, $timestamp);
-
+        
             if ($stmt->execute()) {
-                return ["status" => "success", "message" => "Stock data stored successfully."];
+                return ["status" => "success", "message" => "Stock data updated successfully."];
             } else {
-                error_log("Database insert error: " . $stmt->error);
-                return ["status" => "error", "message" => "Database insert failed."];
+                error_log("Database update error: " . $stmt->error);
+                return ["status" => "error", "message" => "Database update failed."];
             }
+        
 
-        case "get_stock":
-            if (!isset($request['data']['ticker'])) {
-                return ["status" => "error", "message" => "Ticker not provided"];
-            }
-
-            $ticker = strtoupper(trim($request['data']['ticker']));
-            error_log("Checking database for stock: " . $ticker);
-
-            $query = "SELECT ticker, company, price, timestamp FROM stocks WHERE ticker = ?";
-            $stmt = $mydb->prepare($query);
-            if (!$stmt) {
-                error_log("Prepare statement failed: " . $mydb->error);
-                return ["status" => "error", "message" => "Database query preparation failed"];
-            }
-
-            $stmt->bind_param("s", $ticker);
-            if (!$stmt->execute()) {
-                error_log("Query execution failed: " . $stmt->error);
-                return ["status" => "error", "message" => "Query execution failed"];
-            }
-
-            $result = $stmt->get_result();
-            if (!$result) {
-                error_log("Query result retrieval failed: " . $mydb->error);
-                return ["status" => "error", "message" => "Query result retrieval failed"];
-            }
-
-            if ($result->num_rows > 0) {
-                $stockData = $result->fetch_assoc();
-                error_log("Stock found: " . print_r($stockData, true));
-                return ["status" => "success", "data" => $stockData];
-            } else {
-                error_log("Stock not found in DB");
-                return ["status" => "error", "message" => "Stock not found"];
-            }
-
+            case "get_stock":
+                if (!isset($request['data']['ticker'])) {
+                    return ["status" => "error", "message" => "Ticker not provided"];
+                }
+            
+                $ticker = strtoupper(trim($request['data']['ticker']));
+                error_log("Checking database for stock: " . $ticker);
+            
+                $query = "SELECT ticker, company, price, timestamp FROM stocks WHERE ticker = ?";
+                $stmt = $mydb->prepare($query);
+                if (!$stmt) {
+                    error_log("Prepare statement failed: " . $mydb->error);
+                    return ["status" => "error", "message" => "Database query preparation failed"];
+                }
+            
+                $stmt->bind_param("s", $ticker);
+                if (!$stmt->execute()) {
+                    error_log("Query execution failed: " . $stmt->error);
+                    return ["status" => "error", "message" => "Query execution failed"];
+                }
+            
+                $result = $stmt->get_result();
+                if (!$result) {
+                    error_log("Query result retrieval failed: " . $mydb->error);
+                    return ["status" => "error", "message" => "Query result retrieval failed"];
+                }
+            
+                if ($result->num_rows > 0) {
+                    $stockData = $result->fetch_assoc();
+                    error_log("Stock found in DB: " . print_r($stockData, true));
+                    return ["status" => "success", "data" => $stockData];
+                } else {
+                    error_log("Stock not found in DB");
+                    return ["status" => "error", "message" => "Stock not found"];
+                }
+            
         default:
             error_log("Unknown action received: '" . $action . "'");
             return ["status" => "error", "message" => "Unknown action: " . $action];
