@@ -30,26 +30,41 @@ function processRequest($request)
             $ticker = strtoupper(trim($request['data']['ticker']));
             $company = trim($request['data']['company']);
             $price = floatval($request['data']['price']);
-            $timestamp = date("Y-m-d H:i:s", intval($request['data']['timestamp']));
+            $timestamp = date("Y-m-d H:i:s", strtotime($request['data']['timestamp']));
             $table = "stocks";
         
-            //Always update stock if it exists
-            $updateQuery = "INSERT INTO $table (ticker, company, price, timestamp)
-                            VALUES (?, ?, ?, ?)
-                            ON DUPLICATE KEY UPDATE 
-                            company = VALUES(company), 
-                            price = VALUES(price), 
-                            timestamp = VALUES(timestamp)";
-            $stmt = $mydb->prepare($updateQuery);
-            $stmt->bind_param("ssds", $ticker, $company, $price, $timestamp);
+            //Check if stock already exists
+            $checkQuery = "SELECT id FROM $table WHERE ticker = ?";
+            $stmt = $mydb->prepare($checkQuery);
+            $stmt->bind_param("s", $ticker);
+            $stmt->execute();
+            $result = $stmt->get_result();
         
-            if ($stmt->execute()) {
-                return ["status" => "success", "message" => "Stock data updated successfully."];
+            if ($result->num_rows > 0) {
+                //If stock exists, update it instead of inserting a duplicate
+                $updateQuery = "UPDATE $table SET price = ?, timestamp = ? WHERE ticker = ?";
+                $stmt = $mydb->prepare($updateQuery);
+                $stmt->bind_param("dss", $price, $timestamp, $ticker);
+                
+                if ($stmt->execute()) {
+                    return ["status" => "success", "message" => "Stock price updated successfully."];
+                } else {
+                    error_log("Stock update error: " . $stmt->error);
+                    return ["status" => "error", "message" => "Stock update failed."];
+                }
             } else {
-                error_log("Database update error: " . $stmt->error);
-                return ["status" => "error", "message" => "Database update failed."];
-            }
+                // 🔹 If stock doesn't exist, insert it
+                $insertQuery = "INSERT INTO $table (ticker, company, price, timestamp) VALUES (?, ?, ?, ?)";
+                $stmt = $mydb->prepare($insertQuery);
+                $stmt->bind_param("ssds", $ticker, $company, $price, $timestamp);
         
+                if ($stmt->execute()) {
+                    return ["status" => "success", "message" => "Stock data stored successfully."];
+                } else {
+                    error_log("Database insert error: " . $stmt->error);
+                    return ["status" => "error", "message" => "Database insert failed."];
+                }
+            }        
 
             case "get_stock":
                 if (!isset($request['data']['ticker'])) {
