@@ -187,3 +187,1277 @@
 )
 
 [02-Mar-2025 01:11:59 UTC] Stock not found in the database.
+[02-Mar-2025 03:00:21 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:00:21 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:00:21 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:00:21 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:00:21 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:00:21 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 1970-01-01 00:33:45
+        )
+
+)
+
+[02-Mar-2025 03:00:21 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 1970-01-01 00:33:45
+)
+
+[02-Mar-2025 03:00:27 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:00:27 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:00:27 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:00:27 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:00:27 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:00:27 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 1970-01-01 00:33:45
+        )
+
+)
+
+[02-Mar-2025 03:00:27 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 1970-01-01 00:33:45
+)
+
+[02-Mar-2025 03:00:38 UTC] Retrieving stock from database: MSFT
+[02-Mar-2025 03:00:38 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:00:38 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => MSFT
+        )
+
+)
+
+[02-Mar-2025 03:00:38 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:00:38 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:00:38 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:00:38 UTC] Stock not found in the database.
+[02-Mar-2025 03:00:49 UTC] Retrieving stock from database: MSFT
+[02-Mar-2025 03:00:49 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:00:49 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => MSFT
+        )
+
+)
+
+[02-Mar-2025 03:00:49 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:00:49 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:00:49 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:00:49 UTC] Stock not found in the database.
+[02-Mar-2025 03:01:40 UTC] Retrieving stock from database: MSFT
+[02-Mar-2025 03:01:40 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:01:40 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => MSFT
+        )
+
+)
+
+[02-Mar-2025 03:01:40 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:01:40 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:01:40 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => MSFT
+            [company] => Microsoft
+            [price] => 392.76
+            [timestamp] => 2025-03-02 03:00:46
+        )
+
+)
+
+[02-Mar-2025 03:01:40 UTC] Stock found in DB: Array
+(
+    [ticker] => MSFT
+    [company] => Microsoft
+    [price] => 392.76
+    [timestamp] => 2025-03-02 03:00:46
+)
+
+[02-Mar-2025 03:01:43 UTC] Retrieving stock from database: MSFT
+[02-Mar-2025 03:01:43 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:01:43 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => MSFT
+        )
+
+)
+
+[02-Mar-2025 03:01:43 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:01:43 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:01:43 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => MSFT
+            [company] => Microsoft
+            [price] => 392.76
+            [timestamp] => 2025-03-02 03:00:46
+        )
+
+)
+
+[02-Mar-2025 03:01:43 UTC] Stock found in DB: Array
+(
+    [ticker] => MSFT
+    [company] => Microsoft
+    [price] => 392.76
+    [timestamp] => 2025-03-02 03:00:46
+)
+
+[02-Mar-2025 03:05:21 UTC] Retrieving stock from database: AAPL
+[02-Mar-2025 03:05:21 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:05:21 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AAPL
+        )
+
+)
+
+[02-Mar-2025 03:05:21 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:05:21 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:05:21 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:05:21 UTC] Stock not found in the database.
+[02-Mar-2025 03:05:29 UTC] Retrieving stock from database: AAPL
+[02-Mar-2025 03:05:29 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:05:29 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AAPL
+        )
+
+)
+
+[02-Mar-2025 03:05:29 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:05:29 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:05:29 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:05:29 UTC] Stock not found in the database.
+[02-Mar-2025 03:05:55 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:05:55 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:05:55 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:05:55 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:05:55 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:05:55 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Stock not found
+)
+
+[02-Mar-2025 03:05:55 UTC] Stock not found in the database.
+[02-Mar-2025 03:05:58 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:05:58 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:05:58 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:05:58 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:05:58 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:05:58 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Stock not found
+)
+
+[02-Mar-2025 03:05:58 UTC] Stock not found in the database.
+[02-Mar-2025 03:06:25 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:06:25 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:06:25 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:06:25 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:06:25 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:06:25 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:06:25 UTC] Stock not found in the database.
+[02-Mar-2025 03:06:28 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:06:28 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:06:28 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:06:28 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:06:28 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:06:28 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:06:28 UTC] Stock not found in the database.
+[02-Mar-2025 03:06:46 UTC] Retrieving stock from database: TSLA
+[02-Mar-2025 03:06:46 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:06:46 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => TSLA
+        )
+
+)
+
+[02-Mar-2025 03:06:46 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:06:46 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:06:46 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Stock not found
+)
+
+[02-Mar-2025 03:06:46 UTC] Stock not found in the database.
+[02-Mar-2025 03:06:49 UTC] Retrieving stock from database: TSLA
+[02-Mar-2025 03:06:49 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:06:49 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => TSLA
+        )
+
+)
+
+[02-Mar-2025 03:06:49 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:06:49 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:06:49 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Stock not found
+)
+
+[02-Mar-2025 03:06:49 UTC] Stock not found in the database.
+[02-Mar-2025 03:07:03 UTC] Retrieving stock from database: TSLA
+[02-Mar-2025 03:07:03 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:07:03 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => TSLA
+        )
+
+)
+
+[02-Mar-2025 03:07:03 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:07:03 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:07:03 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:07:03 UTC] Stock not found in the database.
+[02-Mar-2025 03:07:08 UTC] Retrieving stock from database: TSLA
+[02-Mar-2025 03:07:08 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:07:08 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => TSLA
+        )
+
+)
+
+[02-Mar-2025 03:07:08 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:07:08 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:07:08 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:07:08 UTC] Stock not found in the database.
+[02-Mar-2025 03:07:35 UTC] Retrieving stock from database: AMZN
+[02-Mar-2025 03:07:35 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:07:35 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AMZN
+        )
+
+)
+
+[02-Mar-2025 03:07:35 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:07:35 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:07:35 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => AMZN
+            [company] => Amazon.com
+            [price] => 209.08
+            [timestamp] => 2025-03-01 15:21:52
+        )
+
+)
+
+[02-Mar-2025 03:07:35 UTC] Stock found in DB: Array
+(
+    [ticker] => AMZN
+    [company] => Amazon.com
+    [price] => 209.08
+    [timestamp] => 2025-03-01 15:21:52
+)
+
+[02-Mar-2025 03:07:39 UTC] Retrieving stock from database: AMZN
+[02-Mar-2025 03:07:39 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:07:39 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AMZN
+        )
+
+)
+
+[02-Mar-2025 03:07:39 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:07:39 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:07:39 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => AMZN
+            [company] => Amazon.com
+            [price] => 209.08
+            [timestamp] => 2025-03-01 15:21:52
+        )
+
+)
+
+[02-Mar-2025 03:07:39 UTC] Stock found in DB: Array
+(
+    [ticker] => AMZN
+    [company] => Amazon.com
+    [price] => 209.08
+    [timestamp] => 2025-03-01 15:21:52
+)
+
+[02-Mar-2025 03:08:02 UTC] Retrieving stock from database: AMZN
+[02-Mar-2025 03:08:02 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:08:02 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AMZN
+        )
+
+)
+
+[02-Mar-2025 03:08:02 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:08:02 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:08:02 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:08:02 UTC] Stock not found in the database.
+[02-Mar-2025 03:08:06 UTC] Retrieving stock from database: AMZN
+[02-Mar-2025 03:08:06 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:08:06 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AMZN
+        )
+
+)
+
+[02-Mar-2025 03:08:06 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:08:06 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:08:06 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:08:06 UTC] Stock not found in the database.
+[02-Mar-2025 03:17:39 UTC] Retrieving stock from database: AMZN
+[02-Mar-2025 03:17:39 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:17:39 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AMZN
+        )
+
+)
+
+[02-Mar-2025 03:17:39 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:17:39 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:17:39 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => AMZN
+            [company] => Amazon.com
+            [price] => 209.08
+            [timestamp] => 2025-03-02 03:08:04
+        )
+
+)
+
+[02-Mar-2025 03:17:39 UTC] Stock found in DB: Array
+(
+    [ticker] => AMZN
+    [company] => Amazon.com
+    [price] => 209.08
+    [timestamp] => 2025-03-02 03:08:04
+)
+
+[02-Mar-2025 03:17:43 UTC] Retrieving stock from database: AMZN
+[02-Mar-2025 03:17:43 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:17:43 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AMZN
+        )
+
+)
+
+[02-Mar-2025 03:17:43 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:17:43 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:17:43 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => AMZN
+            [company] => Amazon.com
+            [price] => 209.08
+            [timestamp] => 2025-03-02 03:08:04
+        )
+
+)
+
+[02-Mar-2025 03:17:43 UTC] Stock found in DB: Array
+(
+    [ticker] => AMZN
+    [company] => Amazon.com
+    [price] => 209.08
+    [timestamp] => 2025-03-02 03:08:04
+)
+
+[02-Mar-2025 03:32:25 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:32:25 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:32:25 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:32:25 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:32:25 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:32:25 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:32:25 UTC] Stock not found in the database.
+[02-Mar-2025 03:32:52 UTC] Retrieving stock from database: AAPL
+[02-Mar-2025 03:32:52 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:32:52 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AAPL
+        )
+
+)
+
+[02-Mar-2025 03:32:52 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:32:52 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:32:52 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:32:52 UTC] Stock not found in the database.
+[02-Mar-2025 03:48:13 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:48:13 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:48:13 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:48:13 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:48:13 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:48:13 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:48:13 UTC] Stock not found in the database.
+[02-Mar-2025 03:48:33 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:48:33 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:48:33 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:48:33 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:48:33 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:48:33 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 2025-03-02 03:48:14
+        )
+
+)
+
+[02-Mar-2025 03:48:33 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 2025-03-02 03:48:14
+)
+
+[02-Mar-2025 03:48:36 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:48:36 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:48:36 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:48:36 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:48:36 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:48:36 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 2025-03-02 03:48:14
+        )
+
+)
+
+[02-Mar-2025 03:48:36 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 2025-03-02 03:48:14
+)
+
+[02-Mar-2025 03:49:06 UTC] Retrieving stock from database: INTC
+[02-Mar-2025 03:49:06 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:49:06 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => INTC
+        )
+
+)
+
+[02-Mar-2025 03:49:06 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:49:06 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:49:06 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:49:06 UTC] Stock not found in the database.
+[02-Mar-2025 03:49:18 UTC] Retrieving stock from database: INTC
+[02-Mar-2025 03:49:18 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:49:18 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => INTC
+        )
+
+)
+
+[02-Mar-2025 03:49:18 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:49:18 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:49:18 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:49:18 UTC] Stock not found in the database.
+[02-Mar-2025 03:49:52 UTC] Retrieving stock from database: INTC
+[02-Mar-2025 03:49:52 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:49:52 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => INTC
+        )
+
+)
+
+[02-Mar-2025 03:49:52 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:49:52 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:49:52 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:49:52 UTC] Stock not found in the database.
+[02-Mar-2025 03:50:01 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:50:01 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:50:01 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:50:01 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:50:01 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:50:01 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:50:01 UTC] Stock not found in the database.
+[02-Mar-2025 03:50:56 UTC] Retrieving stock from database: INTC
+[02-Mar-2025 03:50:56 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:50:56 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => INTC
+        )
+
+)
+
+[02-Mar-2025 03:50:56 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:50:56 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:50:56 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => INTC
+            [company] => Intel
+            [price] => 23.02
+            [timestamp] => 2025-03-02 03:49:53
+        )
+
+)
+
+[02-Mar-2025 03:50:56 UTC] Stock found in DB: Array
+(
+    [ticker] => INTC
+    [company] => Intel
+    [price] => 23.02
+    [timestamp] => 2025-03-02 03:49:53
+)
+
+[02-Mar-2025 03:50:59 UTC] Retrieving stock from database: INTC
+[02-Mar-2025 03:50:59 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:50:59 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => INTC
+        )
+
+)
+
+[02-Mar-2025 03:50:59 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:50:59 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:50:59 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => INTC
+            [company] => Intel
+            [price] => 23.02
+            [timestamp] => 2025-03-02 03:49:53
+        )
+
+)
+
+[02-Mar-2025 03:50:59 UTC] Stock found in DB: Array
+(
+    [ticker] => INTC
+    [company] => Intel
+    [price] => 23.02
+    [timestamp] => 2025-03-02 03:49:53
+)
+
+[02-Mar-2025 03:51:15 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:51:15 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:51:15 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:51:15 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:51:15 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:51:15 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:51:15 UTC] Stock not found in the database.
+[02-Mar-2025 03:52:26 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:52:26 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:52:26 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:52:26 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:52:26 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:52:26 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:52:26 UTC] Stock not found in the database.
+[02-Mar-2025 03:52:35 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:52:35 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:52:35 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:52:35 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:52:35 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:52:35 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:52:35 UTC] Stock not found in the database.
+[02-Mar-2025 03:56:16 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:56:16 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:56:16 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:56:16 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:56:16 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:56:16 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 2025-03-02 03:52:33
+        )
+
+)
+
+[02-Mar-2025 03:56:16 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 2025-03-02 03:52:33
+)
+
+[02-Mar-2025 03:56:19 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 03:56:19 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:56:19 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 03:56:19 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:56:19 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:56:19 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 2025-03-02 03:52:33
+        )
+
+)
+
+[02-Mar-2025 03:56:19 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 2025-03-02 03:52:33
+)
+
+[02-Mar-2025 03:56:30 UTC] Retrieving stock from database: AAPL
+[02-Mar-2025 03:56:30 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 03:56:30 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => AAPL
+        )
+
+)
+
+[02-Mar-2025 03:56:30 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 03:56:30 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 03:56:30 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 03:56:30 UTC] Stock not found in the database.
+[02-Mar-2025 04:00:44 UTC] Retrieving stock from database: DJT
+[02-Mar-2025 04:00:44 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:00:44 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => DJT
+        )
+
+)
+
+[02-Mar-2025 04:00:44 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:00:44 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:00:44 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Stock not found
+)
+
+[02-Mar-2025 04:00:44 UTC] Stock not found in the database.
+[02-Mar-2025 04:00:55 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 04:00:55 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:00:55 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 04:00:55 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:00:55 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:00:55 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 2025-03-02 03:52:33
+        )
+
+)
+
+[02-Mar-2025 04:00:55 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 2025-03-02 03:52:33
+)
+
+[02-Mar-2025 04:00:58 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 04:00:58 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:00:58 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 04:00:58 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:00:58 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:00:58 UTC] Received response from RabbitMQ: Array
+(
+    [status] => success
+    [data] => Array
+        (
+            [ticker] => GOOG
+            [company] => Alphabet
+            [price] => 170.30
+            [timestamp] => 2025-03-02 03:52:33
+        )
+
+)
+
+[02-Mar-2025 04:00:58 UTC] Stock found in DB: Array
+(
+    [ticker] => GOOG
+    [company] => Alphabet
+    [price] => 170.30
+    [timestamp] => 2025-03-02 03:52:33
+)
+
+[02-Mar-2025 04:01:06 UTC] Retrieving stock from database: TSLA
+[02-Mar-2025 04:01:06 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:01:06 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => TSLA
+        )
+
+)
+
+[02-Mar-2025 04:01:06 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:01:06 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:01:06 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:01:06 UTC] Stock not found in the database.
+[02-Mar-2025 04:01:25 UTC] Retrieving stock from database: MSFT
+[02-Mar-2025 04:01:25 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:01:25 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => MSFT
+        )
+
+)
+
+[02-Mar-2025 04:01:25 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:01:25 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:01:25 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:01:25 UTC] Stock not found in the database.
+[02-Mar-2025 04:01:30 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 04:01:30 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:01:30 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 04:01:30 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:01:30 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:01:30 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:01:30 UTC] Stock not found in the database.
+[02-Mar-2025 04:01:34 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 04:01:34 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:01:34 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 04:01:34 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:01:34 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:01:34 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:01:34 UTC] Stock not found in the database.
+[02-Mar-2025 04:01:57 UTC] Retrieving stock from database: DJT
+[02-Mar-2025 04:01:57 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:01:57 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => DJT
+        )
+
+)
+
+[02-Mar-2025 04:01:57 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:01:57 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:01:57 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:01:57 UTC] Stock not found in the database.
+[02-Mar-2025 04:02:00 UTC] Retrieving stock from database: DJT
+[02-Mar-2025 04:02:00 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:02:00 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => DJT
+        )
+
+)
+
+[02-Mar-2025 04:02:00 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:02:00 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:02:00 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:02:00 UTC] Stock not found in the database.
+[02-Mar-2025 04:02:33 UTC] Retrieving stock from database: XXII
+[02-Mar-2025 04:02:33 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:02:33 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => XXII
+        )
+
+)
+
+[02-Mar-2025 04:02:33 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:02:33 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:02:33 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:02:33 UTC] Stock not found in the database.
+[02-Mar-2025 04:02:55 UTC] Retrieving stock from database: GOOG
+[02-Mar-2025 04:02:55 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 04:02:55 UTC] Sending request to RabbitMQ: Array
+(
+    [action] => get_stock
+    [data] => Array
+        (
+            [ticker] => GOOG
+        )
+
+)
+
+[02-Mar-2025 04:02:55 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 04:02:55 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 04:02:55 UTC] Received response from RabbitMQ: Array
+(
+    [status] => error
+    [message] => Unknown action: get_stock
+)
+
+[02-Mar-2025 04:02:55 UTC] Stock not found in the database.

@@ -53,7 +53,7 @@ function processRequest($request)
                     return ["status" => "error", "message" => "Stock update failed."];
                 }
             } else {
-                // 🔹 If stock doesn't exist, insert it
+                // If stock doesn't exist, insert it
                 $insertQuery = "INSERT INTO $table (ticker, company, price, timestamp) VALUES (?, ?, ?, ?)";
                 $stmt = $mydb->prepare($insertQuery);
                 $stmt->bind_param("ssds", $ticker, $company, $price, $timestamp);
