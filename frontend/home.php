@@ -15,24 +15,6 @@ if (!isset($_SESSION['username'])) {
 $username = $_SESSION['username'];
 ?>
 
-<?php
-// Only if you're on HTTPS:
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_httponly', 1);
-
-session_start();
-
-if (!isset($_SESSION['username'])) {
-    // Not logged in:
-    header("Location: login.html");
-    exit();
-}
-
-// If here, user is logged in
-$username = $_SESSION['username'];
-?>
-
-
 <!DOCTYPE html>
 <html>
 <head>
