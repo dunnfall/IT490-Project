@@ -20,6 +20,7 @@ $username = $_SESSION['username'];
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
 
+session_start();
 
 if (!isset($_SESSION['username'])) {
     // Not logged in:
@@ -30,40 +31,35 @@ if (!isset($_SESSION['username'])) {
 // If here, user is logged in
 $username = $_SESSION['username'];
 ?>
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.html");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html>
-<head><title>Home</title></head>
+<head>
+    <title>Home</title>
+    <?php require(__DIR__ . "/../partials/nav.php"); ?>
+</head>
 <body>
-<?php require(__DIR__ . "/../partials/nav.php"); ?>
-<h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
-<p>This is protected content.</p>
-</body>
+<h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
 
-<!-- Added Code EAC-->
-<h2>Stock Information</h2>
-<label for="ticker">Enter Stock Ticker:</label>
-<input type="text" id="ticker" value="">
-<button onclick="fetchStock()">Get Stock Info</button>
+<!-- This form posts to send_email.php -->
+<form action="send_email.php" method="post">
+    <button type="submit" name="send_notification">Send Email Notification</button>
+</form>
 
-<pre id="stockData"></pre>
-
-<script>
-    async function fetchStock() {
-        let ticker = document.getElementById("ticker").value;
-        try {
-            let response = await fetch("../API/fetch_stock.php?ticker=" + ticker);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            let data = await response.json();
-            document.getElementById("stockData").innerHTML = JSON.stringify(data, null, 2);
-        } catch (error) {
-            document.getElementById("stockData").innerHTML = 'Error: ' + error.message;
-        }
-    }
-</script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<?php
+// Show success/error messages (if redirected back here)
+if (isset($_GET['success'])) {
+    echo "<p style='color: green;'>Email sent successfully!</p>";
+}
+if (isset($_GET['error'])) {
+    echo "<p style='color: red;'>Error sending email: " . htmlspecialchars($_GET['error']) . "</p>";
+}
+?>
 </body>
 </html>

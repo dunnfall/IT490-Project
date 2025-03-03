@@ -5,22 +5,27 @@ require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . "/fetch_stock_error.log");
 
-function getStockData($ticker) {
-    $apiKey = 'c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761'; // Replace with your actual API key
-    // Append the URL-encoded ticker to the base URL
+// Ensure ticker is provided
+if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
+    echo json_encode(['error' => 'No ticker provided.']);
+    exit();
+}
+
+$ticker = strtoupper(trim($_GET['ticker']));
+
+function getStock($ticker) {
+    $apiKey = 'c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761';
     $apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=" . urlencode($ticker);
 
-    $curl = curl_init();
+    error_log("Fetching stock data from API: " . $apiUrl);
 
+    $curl = curl_init();
     curl_setopt_array($curl, [
         CURLOPT_URL => $apiUrl,
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
         CURLOPT_HTTPHEADER => [
             "x-rapidapi-host: yahoo-finance15.p.rapidapi.com",
             "x-rapidapi-key: $apiKey"
@@ -29,89 +34,69 @@ function getStockData($ticker) {
 
     $response = curl_exec($curl);
     $err = curl_error($curl);
-
     curl_close($curl);
 
     if ($err) {
-        error_log("cURL Error #: $err");
+        error_log("API cURL Error: " . $err);
         return null;
     }
 
-    if ($response === false) {
-        error_log("API response is false");
-        return null;
-    }
-
-    $data = json_decode($response, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("JSON decode error: " . json_last_error_msg());
-        return null;
-    }
-
-    // Log the API response for debugging
-    error_log("API Response: " . print_r($data, true));
-
-    return $data;
+    return json_decode($response, true);
 }
 
-if (isset($_GET['ticker'])) {
-    $ticker = $_GET['ticker'];
-    $stock_data = getStockData($ticker);
+// Fetch from API
+$stockData = getStock($ticker);
 
-    // Log the stock data for debugging
-    error_log("Stock Data: " . print_r($stock_data, true));
-
-    // Filter the search results for the exact ticker match
-    $foundStock = null;
-    if ($stock_data && isset($stock_data['body']) && is_array($stock_data['body'])) {
-        foreach ($stock_data['body'] as $stock) {
-            if (isset($stock['symbol']) && strcasecmp($stock['symbol'], $ticker) === 0) {
-                $foundStock = $stock;
-                break;
-            }
-        }
-    }
-
-    if ($foundStock) {
-        // Example: extract the company name and the last sale price
-        $company = $foundStock['displayName'];
-        $price   = $foundStock['regularMarketOpen'];
-        $timestamp = time();
-
-        $dataToStore = [
-            'action' => 'store_stock',
-            'data' => [
-                'ticker' => $ticker,
-                'company' => $company,
-                'price' => $price,
-                'timestamp' => $timestamp
-            ]
-        ];
-
-        // Send the request to RabbitMQ
-        $client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
-        $response = $client->send_request($dataToStore);
-
-        // Handle Response
-        if (isset($response['status']) && $response['status'] === 'success') {
-            echo json_encode([
-                'ticker' => $ticker,
-                'company' => $company,
-                'price' => $price,
-                'timestamp' => $timestamp,
-                'message' => 'Stock data stored successfully'
-            ]);
-        } else {
-            echo json_encode([
-                'error' => 'Failed to store stock data',
-                'details' => $response
-            ]);
-        }
-    } else {
-        echo json_encode(['error' => 'Ticker not found in the API response']);
-    }
-} else {
-    echo json_encode(['error' => 'Ticker not provided']);
+if (!$stockData || !isset($stockData['body']) || empty($stockData['body'])) {
+    error_log("Stock not found in API response.");
+    echo json_encode(['error' => 'Ticker not found in the API response']);
+    exit();
 }
-?>
+
+// Extract relevant stock data
+$foundStock = $stockData['body'][0] ?? null;
+
+if ($foundStock) {
+    $company = $foundStock['displayName'] ?? 'N/A';
+    $price = floatval($foundStock['regularMarketOpen'] ?? 0);
+    $timestamp = date("Y-m-d H:i:s");
+    $weekChange = $foundStock['fiftyTwoWeekChangePercent'] ?? null;
+    $weekHigh = $foundStock['fiftyTwoWeekHigh'] ?? null;
+    $weekLow = $foundStock['fiftyTwoWeekLow'] ?? null;
+    $marketCap = $foundStock['marketCap'] ?? null;
+    $region = $foundStock['region'] ?? 'N/A';
+    $currency = $foundStock['currency'] ?? 'N/A';
+
+    // Store or update stock in DB via RabbitMQ
+    $dataToStore = [
+        'action' => 'store_stock',
+        'data' => [
+            'ticker' => $ticker,
+            'company' => $company,
+            'price' => $price,
+            'timestamp' => $timestamp,
+            '52weekchangepercent' => $weekChange,
+            '52weekhigh' => $weekHigh,
+            '52weeklow' => $weekLow,
+            'marketcap' => $marketCap,
+            'region' => $region,
+            'currency' => $currency
+        ]
+    ];
+
+    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+    
+    // Store the response in a variable
+    $response = $client->send_request($dataToStore);
+
+    // Now, we can properly check if the store operation was successful
+    if (!$response || !isset($response['status']) || $response['status'] !== 'success') {
+        error_log("Stock store failed via RabbitMQ. Response: " . print_r($response, true));
+        echo json_encode(['error' => 'Failed to store stock in database.']);
+        exit();
+    }
+
+    // If stock is stored successfully, return a success message
+    echo json_encode(['success' => 'Stock successfully added to database.']);
+    exit();
+}
