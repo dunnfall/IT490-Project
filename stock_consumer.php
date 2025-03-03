@@ -42,7 +42,7 @@ function processRequest($request)
             $currency = $request['data']['currency'] ?? 'N/A';
             $table = "stocks";
         
-            //Check if stock already exists
+            // Check if stock already exists
             $checkQuery = "SELECT id FROM $table WHERE ticker = ?";
             $stmt = $mydb->prepare($checkQuery);
             $stmt->bind_param("s", $ticker);
@@ -73,7 +73,7 @@ function processRequest($request)
                     error_log("Database insert error: " . $stmt->error);
                     return ["status" => "error", "message" => "Database insert failed."];
                 }
-            }        
+            }
 
             case "get_stock":
                 if (!isset($request['data']['ticker'])) {
@@ -110,7 +110,32 @@ function processRequest($request)
                     error_log("Stock not found in DB");
                     return ["status" => "error", "message" => "Stock not found"];
                 }
+                case "get_balance":
+                    if (!isset($request['data']['username'])) {
+                        return ["status" => "error", "message" => "Username not provided"];
+                    }
         
+                    $username = trim($request['data']['username']);
+                    error_log("Fetching balance for user: " . $username);
+        
+                    $query = "SELECT balance FROM users WHERE username = ?";
+                    $stmt = $mydb->prepare($query);
+                    if (!$stmt) {
+                        return ["status" => "error", "message" => "Database query preparation failed"];
+                    }
+        
+                    $stmt->bind_param("s", $username);
+                    if (!$stmt->execute()) {
+                        return ["status" => "error", "message" => "Query execution failed"];
+                    }
+        
+                    $result = $stmt->get_result();
+                    if ($result->num_rows > 0) {
+                        $userData = $result->fetch_assoc();
+                        return ["status" => "success", "balance" => $userData["balance"]];
+                    } else {
+                        return ["status" => "error", "message" => "User not found"];
+                    }
     default:
         error_log("Unknown action received: '" . $action . "'");
         return ["status" => "error", "message" => "Unknown action: " . $action];
