@@ -31,12 +31,35 @@ if (!isset($_SESSION['username'])) {
 // If here, user is logged in
 $username = $_SESSION['username'];
 ?>
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.html");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html>
-<head><title>Home</title></head>
-<?php require(__DIR__ . "/../partials/nav.php"); ?>
+<head>
+    <title>Home</title>
+    <?php require(__DIR__ . "/../partials/nav.php"); ?>
+</head>
 <body>
-<h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
-<p>This is protected content.</p>
+<h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h1>
+
+<!-- This form posts to send_email.php -->
+<form action="send_email.php" method="post">
+    <button type="submit" name="send_notification">Send Email Notification</button>
+</form>
+
+<?php
+// Show success/error messages (if redirected back here)
+if (isset($_GET['success'])) {
+    echo "<p style='color: green;'>Email sent successfully!</p>";
+}
+if (isset($_GET['error'])) {
+    echo "<p style='color: red;'>Error sending email: " . htmlspecialchars($_GET['error']) . "</p>";
+}
+?>
 </body>
 </html>

@@ -399,3 +399,71 @@ Stack trace:
 [02-Mar-2025 22:21:49 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
 [02-Mar-2025 22:21:49 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
 [02-Mar-2025 22:21:49 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 22:29:30 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=ADP
+[02-Mar-2025 22:29:33 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 22:29:33 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 22:29:33 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:38:27 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=INTC
+[02-Mar-2025 23:38:29 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:38:29 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:38:29 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:38:29 UTC] Stock store failed via RabbitMQ. Response: Array
+(
+    [status] => error
+    [message] => Unknown action: store_stock
+)
+
+[02-Mar-2025 23:39:13 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=INTC
+[02-Mar-2025 23:39:14 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:39:14 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:39:14 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:40:17 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=BX
+[02-Mar-2025 23:40:18 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:40:18 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:40:18 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:42:03 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=CB
+[02-Mar-2025 23:42:04 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:42:04 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:42:04 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:42:07 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=ATI
+[02-Mar-2025 23:42:08 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:42:08 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:42:08 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:42:16 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=ADI
+[02-Mar-2025 23:42:18 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:42:18 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:42:18 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:42:49 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=NKE
+[02-Mar-2025 23:42:50 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:42:50 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:42:50 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[02-Mar-2025 23:44:13 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=DAL
+[02-Mar-2025 23:44:14 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[02-Mar-2025 23:44:14 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[02-Mar-2025 23:44:14 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[03-Mar-2025 00:08:36 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=FDX
+[03-Mar-2025 00:08:37 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[03-Mar-2025 00:08:37 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[03-Mar-2025 00:08:37 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[03-Mar-2025 00:08:37 UTC] Stock store failed via RabbitMQ. Response: Array
+(
+    [status] => error
+    [message] => Unknown action: store_stock
+)
+
+[03-Mar-2025 00:10:28 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=AZO
+[03-Mar-2025 00:10:29 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[03-Mar-2025 00:10:29 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[03-Mar-2025 00:10:29 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[03-Mar-2025 00:15:15 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=EBAY
+[03-Mar-2025 00:15:16 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[03-Mar-2025 00:15:16 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[03-Mar-2025 00:15:16 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[03-Mar-2025 00:16:42 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=EBAY
+[03-Mar-2025 00:16:44 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[03-Mar-2025 00:16:44 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[03-Mar-2025 00:16:44 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[03-Mar-2025 00:19:19 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=CSGP
+[03-Mar-2025 00:19:23 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
+[03-Mar-2025 00:19:23 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
+[03-Mar-2025 00:19:23 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
