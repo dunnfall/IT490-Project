@@ -86,6 +86,7 @@ $username = $_SESSION['username'];
     let errorMessage = document.getElementById("errorMessage");
     let stockTable = document.getElementById("stockTable");
     let row = document.getElementById("stockRow");
+    let stockDetails = document.getElementById("stockDetails");
 
     if (!ticker) {
         errorMessage.textContent = "Please enter a valid ticker.";
@@ -94,6 +95,7 @@ $username = $_SESSION['username'];
 
     errorMessage.textContent = "Fetching stock data...";
     stockTable.style.display = "none";
+    stockDetails.style.display = "none"; // Hide stock details initially
 
     try {
         let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
@@ -110,21 +112,51 @@ $username = $_SESSION['username'];
         row.innerHTML = `<td>${data.ticker}</td>
                          <td>${data.company}</td>
                          <td>$${parseFloat(data.price).toFixed(2)}</td>
-                         <td>${data.timestamp}</td>`;
+                         <td>${data.timestamp}</td>
+                         <td><button onclick="showMoreInfo('${data.ticker}')">More Info</button></td>`;
+
     } catch (error) {
         console.error("Fetch Error:", error);
         errorMessage.textContent = "Error fetching stock data.";
         stockTable.style.display = "none";
     }
 }
+async function showMoreInfo(ticker) {
+    let stockDetails = document.getElementById("stockDetails");
+    let detailsContent = document.getElementById("detailsContent");
+
+    stockDetails.style.display = "block";
+    detailsContent.innerHTML = "Fetching additional stock details...";
+
+    try {
+        let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
+        let data = await response.json();
+
+        if (data.error) {
+            detailsContent.innerHTML = "Error fetching stock details.";
+            return;
+        }
+
+        detailsContent.innerHTML = `
+            <p><strong>Ticker:</strong> ${data.ticker}</p>
+            <p><strong>Company:</strong> ${data.company}</p>
+            <p><strong>Price:</strong> $${parseFloat(data.price).toFixed(2)}</p>
+            <p><strong>52-Week High:</strong> $${parseFloat(data['52weekhigh']).toFixed(2)}</p>
+            <p><strong>52-Week Change (%):</strong> ${data["52weekchangepercent"] ? data["52weekchangepercent"].toFixed(2) + "%" : "N/A"}</p>
+            <p><strong>52-Week Low:</strong> $${parseFloat(data['52weeklow']).toFixed(2)}</p>
+            <p><strong>Market Cap:</strong> $${data.marketcap}</p>
+            <p><strong>Region:</strong> ${data.region}</p>
+            <p><strong>Currency:</strong> ${data.currency}</p>
+        `;
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        detailsContent.innerHTML = "Error fetching stock details.";
+    }
+}
+
     </script>
 </head>
 <body>
-    <div style="margin-top:10px;">
-        <h2>Welcome, <?php echo htmlspecialchars($username); ?>!</h2>
-        <a href="logout.php">Logout</a>
-    </div>
-    
     <div>
         <h2>Fetch Stock Data From API</h2>
         <label for="ticker">Enter Stock Ticker:</label>
@@ -140,10 +172,22 @@ $username = $_SESSION['username'];
     </div>
 
     <table id="stockTable" border="1" style="margin-top:10px; display:none;">
-        <tr><th>Ticker</th><th>Company</th><th>Price</th><th>Last Updated</th></tr>
-        <tr id="stockRow"></tr>
-    </table>
+    <tr>
+        <th>Ticker</th>
+        <th>Company</th>
+        <th>Price</th>
+        <th>Last Updated</th>
+        <th>More Info</th>
+    </tr>
+    <tr id="stockRow"></tr>
+</table>
 
-    <p id="errorMessage" style="color: red;"></p>
+<!-- New Section for More Stock Details -->
+<div id="stockDetails" style="display:none; margin-top:10px; border:1px solid #ddd; padding:10px;">
+    <h3>Stock Details</h3>
+    <div id="detailsContent"></div>
+</div>
+
+<p id="errorMessage" style="color: red;"></p>
 </body>
 </html>
