@@ -75,65 +75,92 @@ $username = $_SESSION['username'];
         return;
     }
 
-    errorMessage.textContent = "Fetching stock data...";
+    errorMessage.textContent = "Loading...";
     stockTable.style.display = "none";
     stockDetails.style.display = "none"; // Hide stock details initially
 
-    try {
-        let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
-        let data = await response.json();
+    let retries = 3;
+    let delay = 500; // 2 seconds delay between retries
+    let stockFound = false;
+    let data = null;
 
-        if (data.error) {
-            errorMessage.textContent = "Stock not found.";
-            return;
+    for (let i = 0; i < retries; i++) {
+        try {
+            let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
+            data = await response.json();
+
+            if (!data.error) {
+                stockFound = true;
+                break;
+            }
+        } catch (error) {
+            console.error(`Fetch attempt ${i + 1} failed:`, error);
         }
 
-        errorMessage.textContent = "";
-        stockTable.style.display = "table";
-
-        row.innerHTML = `<td>${data.ticker}</td>
-                         <td>${data.company}</td>
-                         <td>$${parseFloat(data.price).toFixed(2)}</td>
-                         <td>${data.timestamp}</td>
-                         <td><button onclick="showMoreInfo('${data.ticker}')">More Info</button></td>`;
-
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        errorMessage.textContent = "Error fetching stock data.";
-        stockTable.style.display = "none";
+        await new Promise(resolve => setTimeout(resolve, delay)); // Wait before retrying
     }
+
+    if (!stockFound) {
+        errorMessage.textContent = "Stock not found or failed to fetch data.";
+        return;
+    }
+
+    // Display stock data
+    errorMessage.textContent = "";
+    stockTable.style.display = "table";
+
+    row.innerHTML = `<td>${data.ticker}</td>
+                     <td>${data.company}</td>
+                     <td>$${parseFloat(data.price).toFixed(2)}</td>
+                     <td>${data.timestamp}</td>
+                     <td><button onclick="showMoreInfo('${data.ticker}')">More Info</button></td>`;
+
+    stockDetails.style.display = "block"; // Show stock details if needed
 }
 async function showMoreInfo(ticker) {
     let stockDetails = document.getElementById("stockDetails");
     let detailsContent = document.getElementById("detailsContent");
 
     stockDetails.style.display = "block";
-    detailsContent.innerHTML = "Fetching additional stock details...";
+    detailsContent.innerHTML = "Loading additional stock details...";
 
-    try {
-        let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
-        let data = await response.json();
+    let retries = 3;
+    let delay = 500; // 2 seconds delay between retries
+    let stockFound = false;
+    let data = null;
 
-        if (data.error) {
-            detailsContent.innerHTML = "Error fetching stock details.";
-            return;
+    for (let i = 0; i < retries; i++) {
+        try {
+            let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
+            data = await response.json();
+
+            if (!data.error) {
+                stockFound = true;
+                break;
+            }
+        } catch (error) {
+            console.error(`Fetch attempt ${i + 1} failed:`, error);
         }
 
-        detailsContent.innerHTML = `
-            <p><strong>Ticker:</strong> ${data.ticker}</p>
-            <p><strong>Company:</strong> ${data.company}</p>
-            <p><strong>Price:</strong> $${parseFloat(data.price).toFixed(2)}</p>
-            <p><strong>52-Week High:</strong> $${parseFloat(data['52weekhigh']).toFixed(2)}</p>
-            <p><strong>52-Week Change (%):</strong> ${data["52weekchangepercent"] ? data["52weekchangepercent"].toFixed(2) + "%" : "N/A"}</p>
-            <p><strong>52-Week Low:</strong> $${parseFloat(data['52weeklow']).toFixed(2)}</p>
-            <p><strong>Market Cap:</strong> $${data.marketcap}</p>
-            <p><strong>Region:</strong> ${data.region}</p>
-            <p><strong>Currency:</strong> ${data.currency}</p>
-        `;
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        detailsContent.innerHTML = "Error fetching stock details.";
+        await new Promise(resolve => setTimeout(resolve, delay)); // Wait before retrying
     }
+
+    if (!stockFound) {
+        detailsContent.innerHTML = "Stock details not available or failed to fetch data.";
+        return;
+    }
+
+    detailsContent.innerHTML = `
+        <p><strong>Ticker:</strong> ${data.ticker}</p>
+        <p><strong>Company:</strong> ${data.company}</p>
+        <p><strong>Price:</strong> $${parseFloat(data.price).toFixed(2)}</p>
+        <p><strong>52-Week High:</strong> $${parseFloat(data['52weekhigh']).toFixed(2)}</p>
+        <p><strong>52-Week Change (%):</strong> ${data["52weekchangepercent"] ? data["52weekchangepercent"].toFixed(2) + "%" : "N/A"}</p>
+        <p><strong>52-Week Low:</strong> $${parseFloat(data['52weeklow']).toFixed(2)}</p>
+        <p><strong>Market Cap:</strong> $${data.marketcap}</p>
+        <p><strong>Region:</strong> ${data.region}</p>
+        <p><strong>Currency:</strong> ${data.currency}</p>
+    `;
 }
 
     </script>
