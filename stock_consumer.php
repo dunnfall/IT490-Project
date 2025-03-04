@@ -25,6 +25,33 @@ function processRequest($request)
     $action = trim($request['action']);
 
     switch ($action) {
+        case "get_email":
+            if (!isset($request['data']['username'])) {
+                return ["status" => "error", "message" => "Username not provided"];
+            }
+        
+            $username = trim($request['data']['username']);
+            error_log("Fetching email for user: " . $username);
+        
+            $query = "SELECT email FROM users WHERE username = ?";
+            $stmt = $mydb->prepare($query);
+            if (!$stmt) {
+                return ["status" => "error", "message" => "Database query preparation failed"];
+            }
+        
+            $stmt->bind_param("s", $username);
+            if (!$stmt->execute()) {
+                return ["status" => "error", "message" => "Query execution failed"];
+            }
+        
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $userData = $result->fetch_assoc();
+                return ["status" => "success", "email" => $userData["email"]];
+            } else {
+                return ["status" => "error", "message" => "User not found"];
+            }
+
         case "store_stock":
             if (!isset($request['data']['ticker'], $request['data']['company'], $request['data']['price'], $request['data']['timestamp'])) {
                 return ["status" => "error", "message" => "Missing required stock data fields."];

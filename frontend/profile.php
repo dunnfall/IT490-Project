@@ -1,24 +1,39 @@
 <?php
-// Secure session cookie settings
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-session_start();
+function getDB() {
+    $db = new mysqli("192.168.1.142", "testUser", "12345", "it490db");
+    if ($db->connect_error) {
+        die("Database connection failed: " . $db->connect_error);
+    }
+    return $db;
+}
 
-require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+function verifyToken($token) {
+    $db = getDB();
+    $stmt = $db->prepare("SELECT username FROM tokens WHERE token = ? LIMIT 1");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row    = $result->fetch_assoc();
+    $stmt->close();
+    $db->close();
 
-$client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
+    if ($row) {
+        return $row['username'];
+    }
+    return false;
+}
 
-// Check if the user is logged in
-if (!isset($_SESSION['username'])) {
+// Check cookie
+$token = $_COOKIE['authToken'] ?? '';
+if (!$token) {
     header("Location: login.html");
     exit();
 }
-
-// Store the session username
-$username = $_SESSION['username'];
-
-// If here, user is logged in
-$username = $_SESSION['username'];
+$username = verifyToken($token);
+if (!$username) {
+    header("Location: login.html");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => fetchBalance(3));
     <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
     <p><strong>Your Balance:</strong> <span id="balance">Loading...</span></p>
 
-    <form action="send_email.php" method="post">
+    <form action="send_notification.php" method="post">
         <button type="submit" name="send_notification">Send Email Notification</button>
     </form>
 </body>

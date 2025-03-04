@@ -1,18 +1,49 @@
 <?php
-// Secure session cookie settings
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-session_start();
+function getDB() {
+    $db = new mysqli("192.168.1.142", "testUser", "12345", "it490db");
+    if ($db->connect_error) {
+        die("Database connection failed: " . $db->connect_error);
+    }
+    return $db;
+}
 
-// Check if the user is logged in by verifying the session token
-if (!isset($_SESSION['username'])) {
-    // If the user is not logged in, redirect to the login page
+function verifyToken($token) {
+    $db = getDB();
+    // Retrieve username by token
+    $stmt = $db->prepare("SELECT username FROM tokens WHERE token = ? LIMIT 1");
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row    = $result->fetch_assoc();
+    $stmt->close();
+    $db->close();
+
+    if ($row) {
+        // Token found => valid
+        return $row['username'];
+    } else {
+        // Not found => invalid
+        return false;
+    }
+}
+
+// 1) Read the token from cookie
+$token = $_COOKIE['authToken'] ?? '';
+if (!$token) {
+    // No cookie => not logged in
     header("Location: login.html");
     exit();
 }
 
-// Store the session username in a variable
-$username = $_SESSION['username'];
+// 2) Verify token in DB
+$username = verifyToken($token);
+if (!$username) {
+    // Invalid token => redirect
+    header("Location: login.html");
+    exit();
+}
+
+// If valid, show the home page
 ?>
 
 <!DOCTYPE html>
