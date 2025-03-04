@@ -501,3 +501,49 @@ Stack trace:
 [03-Mar-2025 03:05:17 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 165
 [03-Mar-2025 03:05:17 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 215
 [03-Mar-2025 03:05:17 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/website/IT490-Project/rabbitMQLib.inc on line 218
+[04-Mar-2025 18:31:27 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=DOV
+[04-Mar-2025 18:31:27 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function curl_init() in /home/dmz/IT490-Project/API/fetch_stock.php:26
+Stack trace:
+#0 /home/dmz/IT490-Project/API/fetch_stock.php(50): getStockFromAPI()
+#1 {main}
+  thrown in /home/dmz/IT490-Project/API/fetch_stock.php on line 26
+[04-Mar-2025 18:33:49 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=DOV
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  parse_ini_file(/home/website/IT490-Project/testRabbitMQ.ini): Failed to open stream: No such file or directory in /home/dmz/IT490-Project/get_host_info.inc on line 17
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 154
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 154
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 155
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 155
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 156
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 156
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 157
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 157
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 158
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 158
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 167
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 167
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 168
+[04-Mar-2025 18:33:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 168
+[04-Mar-2025 18:37:50 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=DOV
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  parse_ini_file(/home/website/IT490-Project/testRabbitMQ.ini): Failed to open stream: No such file or directory in /home/dmz/IT490-Project/get_host_info.inc on line 17
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 154
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 154
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 155
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 155
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 156
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 156
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 157
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 157
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 158
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 158
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 167
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 167
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Undefined array key "testServer" in /home/dmz/IT490-Project/rabbitMQLib.inc on line 168
+[04-Mar-2025 18:37:50 UTC] PHP Warning:  Trying to access array offset on null in /home/dmz/IT490-Project/rabbitMQLib.inc on line 168
+[04-Mar-2025 18:40:57 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=DOV
+[04-Mar-2025 18:40:58 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/dmz/IT490-Project/rabbitMQLib.inc on line 165
+[04-Mar-2025 18:40:58 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/dmz/IT490-Project/rabbitMQLib.inc on line 215
+[04-Mar-2025 18:40:58 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/dmz/IT490-Project/rabbitMQLib.inc on line 218
+[04-Mar-2025 18:46:45 UTC] Fetching stock data from API: https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=PPL
+[04-Mar-2025 18:46:46 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$auto_delete is deprecated in /home/dmz/IT490-Project/rabbitMQLib.inc on line 165
+[04-Mar-2025 18:46:46 UTC] PHP Deprecated:  Method AMQPQueue::declare() is deprecated in /home/dmz/IT490-Project/rabbitMQLib.inc on line 215
+[04-Mar-2025 18:46:46 UTC] PHP Deprecated:  Creation of dynamic property rabbitMQClient::$conn_queue is deprecated in /home/dmz/IT490-Project/rabbitMQLib.inc on line 218
