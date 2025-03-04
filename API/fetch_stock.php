@@ -1,14 +1,14 @@
 <?php
 header('Content-Type: application/json');
-require_once "/home/website/IT490-Project/rabbitMQLib.inc";
-require_once "/home/website/IT490-Project/testRabbitMQ.ini";
+require_once "/home/dmz/IT490-Project/rabbitMQLib.inc";
+require_once "/home/dmz/IT490-Project/testRabbitMQ.ini";
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', __DIR__ . "/fetch_stock_error.log");
 
-// Ensure ticker is provided
+// Ensure a ticker symbol is provided
 if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
     echo json_encode(['error' => 'No ticker provided.']);
     exit();
@@ -16,7 +16,8 @@ if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
 
 $ticker = strtoupper(trim($_GET['ticker']));
 
-function getStock($ticker) {
+// Function to fetch stock data from the API
+function getStockFromAPI($ticker) {
     $apiKey = 'c445a9ff73msh1ba778fa2e6e77bp1681cbjsn1e7785aa5761';
     $apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/stock/quotes?ticker=" . urlencode($ticker);
 
@@ -26,6 +27,7 @@ function getStock($ticker) {
     curl_setopt_array($curl, [
         CURLOPT_URL => $apiUrl,
         CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 10, // Timeout to prevent hanging requests
         CURLOPT_HTTPHEADER => [
             "x-rapidapi-host: yahoo-finance15.p.rapidapi.com",
             "x-rapidapi-key: $apiKey"
@@ -44,8 +46,8 @@ function getStock($ticker) {
     return json_decode($response, true);
 }
 
-// Fetch from API
-$stockData = getStock($ticker);
+// Fetch stock data from the API
+$stockData = getStockFromAPI($ticker);
 
 if (!$stockData || !isset($stockData['body']) || empty($stockData['body'])) {
     error_log("Stock not found in API response.");
@@ -67,7 +69,7 @@ if ($foundStock) {
     $region = $foundStock['region'] ?? 'N/A';
     $currency = $foundStock['currency'] ?? 'N/A';
 
-    // Store or update stock in DB via RabbitMQ
+    // Prepare stock data for RabbitMQ
     $dataToStore = [
         'action' => 'store_stock',
         'data' => [
@@ -84,19 +86,23 @@ if ($foundStock) {
         ]
     ];
 
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-    
-    // Store the response in a variable
+    // Send stock data to RabbitMQ (handled by the Rabbit VM)
+    $client = new rabbitMQClient("/home/dmz/IT490-Project/testRabbitMQ.ini", "testServer");
     $response = $client->send_request($dataToStore);
 
-    // Now, we can properly check if the store operation was successful
+    // Validate RabbitMQ response
     if (!$response || !isset($response['status']) || $response['status'] !== 'success') {
         error_log("Stock store failed via RabbitMQ. Response: " . print_r($response, true));
         echo json_encode(['error' => 'Failed to store stock in database.']);
         exit();
     }
 
-    // If stock is stored successfully, return a success message
-    echo json_encode(['success' => 'Stock successfully added to database.']);
+    // Return success message to the frontend
+    echo json_encode([
+        'success' => 'Stock successfully added to database.',
+        'ticker' => $ticker,
+        'company' => $company,
+        'price' => $price
+    ]);
     exit();
 }
