@@ -6,13 +6,14 @@ error_reporting(E_ALL);
 session_start();
 
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
-require_once "/home/website/IT490-Project/testRabbitMQ.ini";
+
+// Use the request INI for sending and response INI for receiving
+$requestClient = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
+$responseClient = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ_response.ini", "responseServer");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $identifier = $_POST['identifier'] ?? '';
     $password   = $_POST['password']   ?? '';
-
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     $data = [
         'action'     => 'login',
@@ -20,7 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         'password'   => $password
     ];
 
-    $response = $client->send_request($data);
+    // Send login request to RabbitMQ
+    $requestClient->send_request($data);
+
+    // Wait for response from responseQueue
+    $response = $responseClient->wait_for_response();
 
     if (isset($response['status']) && $response['status'] === 'success') {
         $_SESSION['username'] = $response['username'] ?? $identifier;

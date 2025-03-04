@@ -1,13 +1,14 @@
 <?php
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
-require_once "/home/website/IT490-Project/testRabbitMQ.ini";
+
+// Use the request INI for sending and response INI for receiving
+$requestClient = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
+$responseClient = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ_response.ini", "responseServer");
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
     $email = $_POST['email'];
-
-    $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 
     $data = [
         'action' => 'register',
@@ -19,8 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ]
     ];
 
-    $response = $client->send_request($data);
-    
+    // Send registration request to RabbitMQ
+    $requestClient->send_request($data);
+
+    // Wait for response from responseQueue
+    $response = $responseClient->wait_for_response();
+
     if ($response['status'] === 'success') {
         header("Location: login.html?message=registration_successful");
         exit();

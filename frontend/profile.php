@@ -28,28 +28,28 @@ $username = $_SESSION['username'];
     <?php require(__DIR__ . "/../partials/nav.php"); ?>
     <script>
         async function fetchBalance(retries = 3) {
-    try {
-        let response = await fetch("../API/get_balance.php");
-        let data = await response.json();
+            try {
+                let response = await fetch("../API/get_balance.php");
+                let data = await response.json();
 
-        if (data.error) {
-            if (retries > 0) {
-                console.warn("Retrying fetchBalance... Remaining retries:", retries);
-                setTimeout(() => fetchBalance(retries - 1), 2000); // Retry after 2 seconds
-                return;
+                if (data.error) {
+                    if (retries > 0) {
+                        console.warn("Retrying fetchBalance... Remaining retries:", retries);
+                        setTimeout(() => fetchBalance(retries - 1), 2000); // Retry after 2 seconds
+                        return;
+                    }
+                    document.getElementById("balance").textContent = "Error: " + data.error;
+                } else {
+                    document.getElementById("balance").textContent = "$" + data.balance;
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                document.getElementById("balance").textContent = "Error fetching balance";
             }
-            document.getElementById("balance").textContent = "Error: " + data.error;
-        } else {
-            document.getElementById("balance").textContent = "$" + data.balance;
         }
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        document.getElementById("balance").textContent = "Error fetching balance";
-    }
-}
 
-// Fetch balance on page load
-document.addEventListener("DOMContentLoaded", () => fetchBalance(3));
+        // Fetch balance on page load
+        document.addEventListener("DOMContentLoaded", () => fetchBalance(3));
     </script>
 </head>
 <body>
