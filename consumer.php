@@ -1,67 +1,58 @@
 <?php
 require_once "rabbitMQLib.inc";
-require_once "testRabbitMQ.ini";
-
-$server = new rabbitMQServer("testRabbitMQ.ini", "testServer"); // Receiving requests
-$responseClient = new rabbitMQClient("testRabbitMQ_response.ini", "responseServer"); // Sending responses
+require_once "testRabbitMQ_response.ini";
 
 function processRequest($request)
 {
-    global $responseClient;
-
-    $mydb = new mysqli("localhost", "testUser", "12345", "it490db");
+    $mydb = new mysqli("192.168.1.142", "testUser", "12345", "it490db");
 
     if ($mydb->connect_error) {
         return ["status" => "error", "message" => "Database connection failed: " . $mydb->connect_error];
     }
 
+    if (!isset($request['action'])) {
+        return ["status" => "error", "message" => "Invalid request format."];
+    }
+
     switch ($request['action']) {
+        case "register":
+            $table = $request['table'];
+            $columns = implode(", ", array_keys($request['data']));
+            $values = "'" . implode("', '", array_map([$mydb, 'real_escape_string'], array_values($request['data']))) . "'";
+
+            $sql = "INSERT INTO $table ($columns) VALUES ($values)";
+
+            if ($mydb->query($sql) === TRUE) {
+                return ["status" => "success", "message" => "New user registered."];
+            } else {
+                return ["status" => "error", "message" => $mydb->error];
+            }
+
         case "login":
             $identifier = $request['identifier'];
             $password = $request['password'];
 
-            $sql = "SELECT username, password FROM users WHERE username=? OR email=?";
-            $stmt = $mydb->prepare($sql);
-            $stmt->bind_param("ss", $identifier, $identifier);
-            $stmt->execute();
-            $result = $stmt->get_result();
+            // Check if the user exists (by username or email)
+            $sql = "SELECT * FROM users WHERE username='$identifier' OR email='$identifier'";
+            $result = $mydb->query($sql);
 
             if ($result->num_rows > 0) {
                 $user = $result->fetch_assoc();
                 if (password_verify($password, $user['password'])) {
-                    $response = ["status" => "success", "message" => "User authenticated.", "username" => $user['username']];
+                    return ["status" => "success", "message" => "User authenticated.", "username" => $user['username']];
                 } else {
-                    $response = ["status" => "error", "message" => "Invalid password."];
+                    return ["status" => "error", "message" => "Invalid password."];
                 }
             } else {
-                $response = ["status" => "error", "message" => "User not found."];
+                return ["status" => "error", "message" => "User not found."];
             }
-            break;
-
-        case "register":
-            $username = $mydb->real_escape_string($request['data']['username']);
-            $email = $mydb->real_escape_string($request['data']['email']);
-            $hashedPassword = $request['data']['password'];
-
-            $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-            $stmt = $mydb->prepare($sql);
-            $stmt->bind_param("sss", $username, $email, $hashedPassword);
-
-            if ($stmt->execute()) {
-                $response = ["status" => "success", "message" => "New user registered."];
-            } else {
-                $response = ["status" => "error", "message" => "Registration failed: " . $stmt->error];
-            }
-            break;
 
         default:
-            $response = ["status" => "error", "message" => "Unknown action: " . $request['action']];
+            return ["status" => "error", "message" => "Unknown action: " . $request['action']];
     }
-
-    // Send response back to the client via response queue
-    $responseClient->send_request($response);
 }
 
 // Start Consumer to Listen for Messages
+$server = new rabbitMQServer("testRabbitMQ_response.ini", "responseServer");
 $server->process_requests("processRequest");
 ?>
