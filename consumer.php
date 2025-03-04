@@ -1,6 +1,6 @@
 <?php
 require_once "rabbitMQLib.inc";
-require_once "testRabbitMQ.ini";
+require_once "testRabbitMQ_response.ini";
 
 function processRequest($request)
 {
@@ -39,7 +39,7 @@ function processRequest($request)
             if ($result->num_rows > 0) {
                 $user = $result->fetch_assoc();
                 if (password_verify($password, $user['password'])) {
-                    return ["status" => "success", "message" => "User authenticated."];
+                    return ["status" => "success", "message" => "User authenticated.", "username" => $user['username']];
                 } else {
                     return ["status" => "error", "message" => "Invalid password."];
                 }
@@ -53,6 +53,6 @@ function processRequest($request)
 }
 
 // Start Consumer to Listen for Messages
-$server = new rabbitMQServer("testRabbitMQ.ini", "testServer");
+$server = new rabbitMQServer("testRabbitMQ_response.ini", "responseServer");
 $server->process_requests("processRequest");
 ?>
