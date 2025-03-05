@@ -1,5 +1,8 @@
 <?php
 require_once "/home/dmz/IT490-Project/rabbitMQLib.inc";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 function processStockRequest($request) {
     if (!isset($request['data']['ticker'])) {
