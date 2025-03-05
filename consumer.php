@@ -15,6 +15,25 @@ function processRequest($request)
     }
 
     switch ($request['action']) {
+        case "request_stock":
+            if (!isset($request['data']['ticker'])) {
+                return ["status" => "error", "message" => "Ticker not provided"];
+            }
+        
+            $ticker = strtoupper(trim($request['data']['ticker']));
+            error_log("Forwarding stock request to DMZ for ticker: " . $ticker);
+        
+            $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+        
+            $dmzRequest = [
+                'action' => 'fetch_stock',
+                'data' => ['ticker' => $ticker]
+            ];
+        
+            $response = $dmzClient->send_request($dmzRequest);
+        
+            return $response;
+        
         case "store_stock":
             if (!isset($request['data']['ticker'], $request['data']['company'], $request['data']['price'], $request['data']['timestamp'])) {
                 return ["status" => "error", "message" => "Missing required stock data fields."];

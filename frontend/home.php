@@ -22,46 +22,41 @@ $username = $_SESSION['username'];
     <?php require(__DIR__ . "/../partials/nav.php"); ?>
     <script>
         async function fetchStock() {
-            let ticker = document.getElementById("ticker").value.trim().toUpperCase();
-            let errorMessage = document.getElementById("errorMessage");
-            let stockTable = document.getElementById("stockTable");
-            let row = document.getElementById("stockRow");
+    let ticker = document.getElementById("ticker").value.trim().toUpperCase();
+    let errorMessage = document.getElementById("errorMessage");
+    let stockTable = document.getElementById("stockTable");
+    let row = document.getElementById("stockRow");
 
-            if (!ticker) {
-                errorMessage.textContent = "Please enter a valid ticker.";
-                return;
-            }
+    if (!ticker) {
+        errorMessage.textContent = "Please enter a valid ticker.";
+        return;
+    }
 
-            errorMessage.textContent = "Fetching latest stock data...";
-            stockTable.style.display = "none";
+    errorMessage.textContent = "Requesting stock data from API...";
+    stockTable.style.display = "none";
 
-            try {
-                console.log("Checking database...");
-                let response = await fetch(`../API/get_stock.php?ticker=${ticker}`);
-                let data = await response.json();
+    try {
+        console.log("Sending request to RabbitMQ...");
+        let response = await fetch(`../API/request_stock.php?ticker=${ticker}`);
+        let data = await response.json();
 
-                if (data.error) {
-                    console.log("Stock not found. Fetching from API...");
-                    let fetchResponse = await fetch(`../API/fetch_stock.php?ticker=${ticker}`);
-                    let fetchData = await fetchResponse.json();
-
-                    if (fetchData.error) {
-                        errorMessage.textContent = fetchData.error;
-                        return;
-                    }
-
-                    console.log("Stock added to database, waiting for update...");
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-
-                // Now fetch the stock from the database after update
-                await getStock();
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                errorMessage.textContent = "Error fetching stock data.";
-                stockTable.style.display = "none";
-            }
+        if (data.error) {
+            errorMessage.textContent = data.error;
+            return;
         }
+
+        console.log("Waiting for stock to be added...");
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds before checking DB
+
+        // Now fetch the stock from the database
+        await getStock();
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        errorMessage.textContent = "Error requesting stock data.";
+        stockTable.style.display = "none";
+    }
+}
+
 
         async function getStock() {
     let ticker = document.getElementById("ticker2").value.trim().toUpperCase();
