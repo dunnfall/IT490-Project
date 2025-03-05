@@ -19,18 +19,41 @@ function processRequest($request)
             if (!isset($request['data']['ticker'])) {
                 return ["status" => "error", "message" => "Ticker not provided"];
             }
-            
+        
             $ticker = strtoupper(trim($request['data']['ticker']));
             $query = "SELECT * FROM stocks WHERE ticker = ?";
             $stmt = $mydb->prepare($query);
             $stmt->bind_param("s", $ticker);
+        
+            // Try fetching from the database first
             $stmt->execute();
             $result = $stmt->get_result();
-            
+        
             if ($result->num_rows > 0) {
                 return ["status" => "success", "data" => $result->fetch_assoc()];
             }
-            return ["status" => "error", "message" => "Stock not found"];
+        
+            // If not found, request data from the DMZ
+            error_log("Stock not found. Requesting from DMZ...");
+            $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+        
+            $dmzRequest = ['action' => 'request_stock', 'data' => ['ticker' => $ticker]];
+            $dmzClient->send_request($dmzRequest);
+        
+            // Wait for DMZ to process and insert the stock into the database
+            for ($i = 0; $i < 5; $i++) { // Retry 5 times (total wait = 10 seconds)
+                sleep(2); // Wait 2 seconds before retrying
+                error_log("Retrying database query after waiting for DMZ update...");
+        
+                $stmt->execute();
+                $result = $stmt->get_result();
+        
+                if ($result->num_rows > 0) {
+                    return ["status" => "success", "data" => $result->fetch_assoc()];
+                }
+            }
+        
+            return ["status" => "error", "message" => "Stock not found after multiple retries."];
         
         case "store_stock":
             if (!isset($request['data']['ticker'], $request['data']['company'], $request['data']['price'])) {

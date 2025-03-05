@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+$ini = parse_ini_file("/home/website/IT490-Project/testRabbitMQ.ini");
 
 if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
     echo json_encode(['error' => 'No ticker provided.']);
@@ -20,9 +21,8 @@ if ($response && isset($response['status']) && $response['status'] === 'success'
     exit();
 }
 
-// Step 2: If stock is not found, request it from the API
-$request = ['action' => 'request_stock', 'data' => ['ticker' => $ticker]];
-$client->send_request($request);
+echo json_encode(['error' => 'Stock not found. Requesting update.']);
+exit();
 
 // Wait for the stock data to be updated in the database
 sleep(3);
