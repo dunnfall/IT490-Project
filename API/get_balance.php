@@ -1,18 +1,20 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json'); // Return JSON
+
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
-// Start session to get logged-in user
-session_start();
+// We assume profile.php already checked the token. 
+// So we do NOT call "verifyToken" again here.
 
-// Check if user is logged in
-if (!isset($_SESSION['username'])) {
-    echo json_encode(['error' => 'User not logged in']);
+// Instead, we need the username. You can pass it from profile.php 
+// in the fetch URL, e.g. fetch("get_balance.php?user=bob")
+
+$username = $_GET['user'] ?? '';
+if (!$username) {
+    echo json_encode(["error" => "No username specified"]);
     exit();
 }
-
-// Get the username from session
-$username = $_SESSION['username'];
 
 // Create RabbitMQ client
 $client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
@@ -25,10 +27,10 @@ $request = [
     ]
 ];
 
-// Send request to RabbitMQ and wait for response
+// Send request
 $response = $client->send_request($request);
 
-// Validate response and return JSON
+// Return JSON
 if ($response && isset($response["status"]) && $response["status"] === "success") {
     echo json_encode(["balance" => number_format($response["balance"], 2)]);
 } else {

@@ -1,14 +1,27 @@
 <?php
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-session_start();
+require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
-if (!isset($_SESSION['username'])) {
+// 1) Check for token in cookie
+$token = $_COOKIE['authToken'] ?? '';
+if (!$token) {
     header("Location: login.html");
     exit();
 }
 
-$username = $_SESSION['username'];
+// 2) Verify token with consumer
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$request = ['action'=>'verifyToken','token'=>$token];
+$response = $client->send_request($request);
+
+// 3) If invalid, redirect
+if (!isset($response['status']) || $response['status'] !== 'success') {
+    header("Location: login.html");
+    exit();
+}
+
+// If valid, we have $response['username']
+$username = $response['username'];
 ?>
 <!DOCTYPE html>
 <html>

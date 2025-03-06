@@ -1,24 +1,29 @@
 <?php
-// Secure session cookie settings
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-session_start();
-
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
-$client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
-
-// Check if the user is logged in
-if (!isset($_SESSION['username'])) {
+// 1) Get the token from cookie
+$token = $_COOKIE['authToken'] ?? '';
+if (!$token) {
     header("Location: login.html");
     exit();
 }
 
-// Store the session username
-$username = $_SESSION['username'];
+// 2) Verify the token via RabbitMQ
+$client   = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$response = $client->send_request([
+    'action' => 'verifyToken',
+    'token'  => $token
+]);
 
-// If here, user is logged in
-$username = $_SESSION['username'];
+// 3) Check response
+if (!isset($response['status']) || $response['status'] !== 'success') {
+    header("Location: login.html");
+    exit();
+}
+
+// 4) We have a valid token
+$username = $response['username'];
 ?>
 
 <!DOCTYPE html>
@@ -27,29 +32,33 @@ $username = $_SESSION['username'];
     <title>Profile</title>
     <?php require(__DIR__ . "/../partials/nav.php"); ?>
     <script>
-        async function fetchBalance(retries = 3) {
-    try {
-        let response = await fetch("../API/get_balance.php");
-        let data = await response.json();
+      // This function calls "../API/get_balance.php?user=USERNAME"
+      // and uses retries if an error occurs.
+      async function fetchBalance(retries = 3) {
+        try {
+          // Single fetch call using the username from PHP
+          let response = await fetch("../API/get_balance.php?user=<?php echo urlencode($username); ?>");
+          let data = await response.json();
 
-        if (data.error) {
+          if (data.error) {
             if (retries > 0) {
-                console.warn("Retrying fetchBalance... Remaining retries:", retries);
-                setTimeout(() => fetchBalance(retries - 1), 2000); // Retry after 2 seconds
-                return;
+              console.warn("Retrying fetchBalance... Remaining retries:", retries);
+              setTimeout(() => fetchBalance(retries - 1), 2000); 
+              return;
             }
             document.getElementById("balance").textContent = "Error: " + data.error;
-        } else {
+          } else {
+            // Successfully got the balance
             document.getElementById("balance").textContent = "$" + data.balance;
+          }
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          document.getElementById("balance").textContent = "Error fetching balance";
         }
-    } catch (error) {
-        console.error("Fetch Error:", error);
-        document.getElementById("balance").textContent = "Error fetching balance";
-    }
-}
+      }
 
-// Fetch balance on page load
-document.addEventListener("DOMContentLoaded", () => fetchBalance(3));
+      // Run on page load
+      document.addEventListener("DOMContentLoaded", () => fetchBalance(3));
     </script>
 </head>
 <body>
