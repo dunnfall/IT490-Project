@@ -219,6 +219,89 @@ function processRequest($request)
                 return ["status" => "error", "message" => "Invalid token"];
             }
 
+            case "verifyAndGetEmail":
+                $token = $request['token'] ?? '';
+                if (!$token) {
+                    return ["status" => "error", "message" => "No token provided"];
+                }
+            
+                // tokens table
+                $sqlToken = "SELECT username FROM tokens WHERE token = ? LIMIT 1";
+                $stmt     = $mydb->prepare($sqlToken);
+                $stmt->bind_param("s", $token);
+                $stmt->execute();
+                $resToken = $stmt->get_result();
+            
+                if ($resToken->num_rows < 1) {
+                    return ["status" => "error", "message" => "Invalid token"];
+                }
+            
+                $row      = $resToken->fetch_assoc();
+                $username = $row['username'];
+            
+                // users table for email
+                $sqlEmail = "SELECT email FROM users WHERE username = ? LIMIT 1";
+                $stmt2    = $mydb->prepare($sqlEmail);
+                $stmt2->bind_param("s", $username);
+                $stmt2->execute();
+                $resEmail = $stmt2->get_result();
+            
+                if ($resEmail->num_rows < 1) {
+                    return ["status" => "error", "message" => "User not found"];
+                }
+            
+                $rowEmail = $resEmail->fetch_assoc();
+                return [
+                    "status" => "success",
+                    "email"  => $rowEmail['email']
+                ];
+
+        case "verifyAndGetBalance":
+            // 1) Check if a token was provided
+            $token = $request['token'] ?? '';
+            if (!$token) {
+                return ["status" => "error", "message" => "No token provided"];
+            }
+        
+            // 2) Verify the token in 'tokens' table
+            $sqlToken = "SELECT username FROM tokens WHERE token = ? LIMIT 1";
+            $stmt     = $mydb->prepare($sqlToken);
+            $stmt->bind_param("s", $token);
+            $stmt->execute();
+            $resToken = $stmt->get_result();
+        
+            if ($resToken->num_rows < 1) {
+                // Token not found => invalid
+                return ["status" => "error", "message" => "Invalid token"];
+            }
+        
+            // 3) Get the username from the tokens table
+            $row      = $resToken->fetch_assoc();
+            $username = $row['username'];
+        
+            // 4) Now retrieve the user's balance from 'users' table
+            $sqlBalance = "SELECT balance FROM users WHERE username = ? LIMIT 1";
+            $stmt2      = $mydb->prepare($sqlBalance);
+            $stmt2->bind_param("s", $username);
+            $stmt2->execute();
+            $resBal = $stmt2->get_result();
+        
+            if ($resBal->num_rows < 1) {
+                // If no user row found, return error
+                return ["status" => "error", "message" => "User not found"];
+            }
+        
+            // 5) Get the balance
+            $rowBal  = $resBal->fetch_assoc();
+            $balance = $rowBal['balance'];
+        
+            // 6) Return a success array with balance (and username if needed)
+            return [
+                "status"   => "success",
+                "username" => $username,
+                "balance"  => $balance
+            ];
+
         // Optionally add a "logout" case to remove token if needed
         // case "logout":
         //    ...
