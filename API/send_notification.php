@@ -42,12 +42,12 @@ try {
     $mail->isSMTP();
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'YOUR_GMAIL@gmail.com';
-    $mail->Password   = 'YOUR_APP_PASSWORD';
+    $mail->Username   = 'alucky0140@gmail.com';
+    $mail->Password   = 'fvts edcz wnmy izgi';
     $mail->SMTPSecure = 'tls';
     $mail->Port       = 587;
 
-    $mail->setFrom('YOUR_GMAIL@gmail.com', 'My App Notifications');
+    $mail->setFrom('alucky0140@gmail.com', 'My App Notifications');
     $mail->addAddress($userEmail);
 
     $mail->isHTML(true);
