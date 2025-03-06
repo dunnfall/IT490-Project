@@ -10,28 +10,18 @@ if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
 
 $ticker = strtoupper(trim($_GET['ticker']));
 
+// Connect to RabbitMQ
 $client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
 
-// Step 1: Check if stock exists in the database first
-$request = ['action' => 'get_stock', 'data' => ['ticker' => $ticker]];
+// Request the stock data (fetch from API & store in DB)
+$request = ['action' => 'fetch_stock', 'data' => ['ticker' => $ticker]];
 $response = $client->send_request($request);
 
-if ($response && isset($response['status']) && $response['status'] === 'success') {
-    echo json_encode($response['data']);
-    exit();
-}
-
-echo json_encode(['error' => 'Stock not found. Requesting update.']);
-exit();
-
-// Wait for the stock data to be updated in the database
-sleep(3);
-
-// Step 3: Fetch the stock from the database again
-$response = $client->send_request(['action' => 'get_stock', 'data' => ['ticker' => $ticker]]);
+// If stock data is returned, send it to the frontend
 if ($response && isset($response['status']) && $response['status'] === 'success') {
     echo json_encode($response['data']);
 } else {
     echo json_encode(['error' => 'Stock not found or request failed.']);
 }
+exit();
 ?>
