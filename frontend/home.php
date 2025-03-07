@@ -39,6 +39,12 @@ $username = $response['username'];
             let stockTable = document.getElementById("stockTable");
             let row = document.getElementById("stockRow");
             let stockDetails = document.getElementById("stockDetails");
+            let recommendationContainer = document.getElementById("recommendationContainer");
+            let recommendationText = document.getElementById("recommendationText");
+
+            console.log("Elements Found:", {
+                errorMessage, stockTable, row, stockDetails, recommendationContainer, recommendationText
+            });
 
             if (!ticker) {
                 errorMessage.textContent = "Please enter a valid ticker.";
@@ -66,6 +72,12 @@ $username = $response['username'];
                                  <td>$${parseFloat(data.price).toFixed(2)}</td>
                                  <td>${data.timestamp}</td>
                                  <td><button onclick="showMoreInfo('${data.ticker}')">More Info</button></td>`;
+
+                let recommendationResponse = await fetch(`/backend/algorithm.php?ticker=${ticker}`);
+                let recommendationTextData = await recommendationResponse.text();
+
+                recommendationText.innerHTML = `<strong>Recommendation:</strong> ${recommendationTextData}`;
+                recommendationContainer.style.display = "block";
             } catch (error) {
                 console.error("Fetch Error:", error);
                 errorMessage.textContent = "Error fetching stock data.";
