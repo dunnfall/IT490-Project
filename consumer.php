@@ -14,7 +14,7 @@ function processRequest($request)
     }
 
     switch ($request['action']) {
-        case "get_stock":
+        /*case "get_stock":
             if (!isset($request['data']['ticker'])) {
                 return ["status" => "error", "message" => "Ticker not provided"];
             }
@@ -37,64 +37,56 @@ function processRequest($request)
                 return ["status" => "error", "message" => "Stock not found"];
             }
 
-            error_log("Fetching ticker for user: " . $ticker);
+            error_log("Fetching ticker for user: IT DID NOT FINISH GET_STOCK " . $ticker);*/
 
-        case "retrieve_stock":
-            if (!isset($request['data']['ticker'])) {
-                return ["status" => "error", "message" => "Ticker not provided"];
-            }
-
-            $ticker = strtoupper(trim($request['data']['ticker']));
-
-            //Request latest stock data from DMZ Server
-            $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
-            $dmzRequest = ['type' => 'fetch_stock', 'data' => ['ticker' => $ticker]];  // Corrected type field
-            $dmzResponse = $dmzClient->send_request($dmzRequest);
-
-            // Handle API response failure
-            if (!$dmzResponse || $dmzResponse['status'] !== 'success') {
-                return ["status" => "error", "message" => "Failed to fetch stock data from API."];
-            }
-
-            //Step 3: Extract stock data from the DMZ response
-            $stockData = $dmzResponse['data'];
-            $company = trim($stockData['company']);
-            $price = floatval($stockData['price']);
-            $timestamp = date("Y-m-d H:i:s"); // Current server time
-            $weekChange = $stockData['52weekchangepercent'] ?? null;
-            $weekHigh = $stockData['52weekhigh'] ?? null;
-            $weekLow = $stockData['52weeklow'] ?? null;
-            $marketCap = $stockData['marketcap'] ?? null;
-            $region = $stockData['region'] ?? 'N/A';
-            $currency = $stockData['currency'] ?? 'N/A';
-
-            //Step 4: Check if stock already exists in the database
-            $checkQuery = "SELECT id FROM stocks WHERE ticker = ?";
-            if ($stmt = $mydb->prepare($checkQuery)) {
+            case "retrieve_stock":
+                if (!isset($request['data']['ticker'])) {
+                    return ["status" => "error", "message" => "Ticker not provided"];
+                }
+            
+                $ticker = strtoupper(trim($request['data']['ticker']));
+                error_log("Checking stock in database: " . $ticker);
+            
+                // Check if stock exists in the database
+                $query = "SELECT * FROM stocks WHERE ticker = ?";
+                $stmt = $mydb->prepare($query);
                 $stmt->bind_param("s", $ticker);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $stockExists = ($result->num_rows > 0);
-                $stmt->close();
-            } else {
-                return ["status" => "error", "message" => "Database query error: " . $mydb->error];
-            }
-
-            //Update if exists, insert if not
-            if ($stockExists) {
-                // Update stock in the database
-                $updateQuery = "UPDATE stocks 
-                                SET price = ?, timestamp = ?, `52weekchangepercent` = ?, `52weekhigh` = ?, `52weeklow` = ?, marketcap = ?, region = ?, currency = ? 
-                                WHERE ticker = ?";
-                if ($stmt = $mydb->prepare($updateQuery)) {
-                    $stmt->bind_param("dssdddsss", $price, $timestamp, $weekChange, $weekHigh, $weekLow, $marketCap, $region, $currency, $ticker);
-                    $stmt->execute();
-                    $stmt->close();
-                } else {
-                    return ["status" => "error", "message" => "Database update error: " . $mydb->error];
+            
+                if ($result->num_rows > 0) {
+                    error_log("Stock found in DB: " . $ticker);
+                    $stockData = $result->fetch_assoc();
+                    $stmt->close(); 
+                    return ["status" => "success", "data" => $stockData];
                 }
-            } else {
+                $stmt->close(); 
+            
+                // If stock is not found, request from DMZ server
+                error_log("Stock not found in DB, requesting from DMZ: " . $ticker);
+                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzRequest = ['type' => 'fetch_stock', 'data' => ['ticker' => $ticker]]; 
+                $dmzResponse = $dmzClient->send_request($dmzRequest);
+            
+                if (!$dmzResponse || $dmzResponse['status'] !== 'success') {
+                    error_log("ERROR: Failed to fetch stock from DMZ!");
+                    return ["status" => "error", "message" => "Failed to fetch stock data from API."];
+                }
+            
+                // Step 3: Extract stock data from DMZ response
+                $stockData = $dmzResponse['data'];
+                $company = trim($stockData['company']);
+                $price = floatval($stockData['price']);
+                $timestamp = date("Y-m-d H:i:s"); // Current server time
+                $weekChange = $stockData['52weekchangepercent'] ?? null;
+                $weekHigh = $stockData['52weekhigh'] ?? null;
+                $weekLow = $stockData['52weeklow'] ?? null;
+                $marketCap = $stockData['marketcap'] ?? null;
+                $region = $stockData['region'] ?? 'N/A';
+                $currency = $stockData['currency'] ?? 'N/A';
+            
                 // Insert new stock into database
+                error_log("Inserting new stock into DB: " . $ticker);
                 $insertQuery = "INSERT INTO stocks (ticker, company, price, timestamp, `52weekchangepercent`, `52weekhigh`, `52weeklow`, marketcap, region, currency) 
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 if ($stmt = $mydb->prepare($insertQuery)) {
@@ -102,15 +94,19 @@ function processRequest($request)
                     $stmt->execute();
                     $stmt->close();
                 } else {
+                    error_log("ERROR: Database insert failed!");
                     return ["status" => "error", "message" => "Database insert error: " . $mydb->error];
                 }
-            }
+            
+                error_log("Stock retrieved from DMZ and inserted: " . json_encode($stockData));
+            
+                // Step 6: Return success response with newly inserted data
+                return ["status" => "success", "data" => json_decode(json_encode($stockData), true)];
+            
 
-            // Step 6: Return success response
-            return ["status" => "success", "message" => "Stock data updated successfully", "data" => $stockData];
+            
 
-
-        case "get_balance":
+        /*case "get_balance":
             if (!isset($request['data']['username'])) {
                 return ["status" => "error", "message" => "Username not provided"];
             }
@@ -135,7 +131,7 @@ function processRequest($request)
                 return ["status" => "success", "balance" => $userData["balance"]];
             } else {
                 return ["status" => "error", "message" => "User not found"];
-            }
+            }*/
 
         case "register":
             $table = $request['table'];

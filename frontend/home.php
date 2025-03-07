@@ -40,7 +40,7 @@ $username = $response['username'];
             let row = document.getElementById("stockRow");
             let stockDetails = document.getElementById("stockDetails");
             let recommendationContainer = document.getElementById("recommendationContainer");
-            let recommendationText = document.getElementById("recommendationText");
+
 
             console.log("Elements Found:", {
                 errorMessage, stockTable, row, stockDetails, recommendationContainer, recommendationText
@@ -73,15 +73,35 @@ $username = $response['username'];
                                  <td>${data.timestamp}</td>
                                  <td><button onclick="showMoreInfo('${data.ticker}')">More Info</button></td>`;
 
-                let recommendationResponse = await fetch(`/backend/algorithm.php?ticker=${ticker}`);
-                let recommendationTextData = await recommendationResponse.text();
-
-                recommendationText.innerHTML = `<strong>Recommendation:</strong> ${recommendationTextData}`;
                 recommendationContainer.style.display = "block";
+                document.getElementById("getRecommendationButton").setAttribute("data-ticker", ticker);
+
             } catch (error) {
                 console.error("Fetch Error:", error);
                 errorMessage.textContent = "Error fetching stock data.";
                 stockTable.style.display = "none";
+            }
+        }
+
+        async function getRecommendation() {
+        let ticker = document.getElementById("getRecommendationButton").getAttribute("data-ticker");
+        let recommendationText = document.getElementById("recommendationText");
+
+            if (!ticker) {
+                recommendationText.innerHTML = "Error: No stock selected.";
+                return;
+            }
+
+            recommendationText.innerHTML = "Fetching recommendation...";
+
+            try {
+                let response = await fetch(`../backend/algorithm.php?ticker=${ticker}`);
+                let recommendationTextData = await response.text();
+
+                recommendationText.innerHTML = `<strong>Recommendation:</strong> ${recommendationTextData}`;
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                recommendationText.innerHTML = "Error fetching recommendation.";
             }
         }
 
@@ -197,8 +217,10 @@ function renderStockChart(low, high, percentChange) {
 
     <div id="recommendationContainer" style="display:none; margin-top:10px; border:1px solid #ddd; padding:10px;">
         <h3>Stock Recommendation</h3>
+        <button id="getRecommendationButton" onclick="getRecommendation()">Get Recommendation</button>
         <p id="recommendationText"></p>
     </div>
+
 
     <p id="errorMessage" style="color: red;"></p>
 </body>
