@@ -21,102 +21,115 @@ function processRequest($request)
             }
         
             $ticker = strtoupper(trim($request['data']['ticker']));
+        
+            // Query the database to retrieve stock information
             $query = "SELECT * FROM stocks WHERE ticker = ?";
             $stmt = $mydb->prepare($query);
             $stmt->bind_param("s", $ticker);
-        
-            // Try fetching from the database first
             $stmt->execute();
             $result = $stmt->get_result();
         
             if ($result->num_rows > 0) {
                 return ["status" => "success", "data" => $result->fetch_assoc()];
+            } else {
+                return ["status" => "error", "message" => "Stock not found"];
+            }
+        case "retrieve_stock":
+            if (!isset($request['data']['ticker'])) {
+                return ["status" => "error", "message" => "Ticker not provided"];
             }
         
-            // If not found, request data from the DMZ
-            error_log("Stock not found. Requesting from DMZ...");
+            $ticker = strtoupper(trim($request['data']['ticker']));
+        
+            //Request latest stock data from DMZ Server
             $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+            $dmzRequest = ['type' => 'fetch_stock', 'data' => ['ticker' => $ticker]];  // Corrected type field
+            $dmzResponse = $dmzClient->send_request($dmzRequest);
         
-            $dmzRequest = ['action' => 'request_stock', 'data' => ['ticker' => $ticker]];
-            $dmzClient->send_request($dmzRequest);
+            // Handle API response failure
+            if (!$dmzResponse || $dmzResponse['status'] !== 'success') {
+                return ["status" => "error", "message" => "Failed to fetch stock data from API."];
+            }
         
-            // Wait for DMZ to process and insert the stock into the database
-            for ($i = 0; $i < 5; $i++) { // Retry 5 times (total wait = 10 seconds)
-                sleep(2); // Wait 2 seconds before retrying
-                error_log("Retrying database query after waiting for DMZ update...");
+            //Step 3: Extract stock data from the DMZ response
+            $stockData = $dmzResponse['data'];
+            $company = trim($stockData['company']);
+            $price = floatval($stockData['price']);
+            $timestamp = date("Y-m-d H:i:s"); // Current server time
+            $weekChange = $stockData['52weekchangepercent'] ?? null;
+            $weekHigh = $stockData['52weekhigh'] ?? null;
+            $weekLow = $stockData['52weeklow'] ?? null;
+            $marketCap = $stockData['marketcap'] ?? null;
+            $region = $stockData['region'] ?? 'N/A';
+            $currency = $stockData['currency'] ?? 'N/A';
         
+            //Step 4: Check if stock already exists in the database
+            $checkQuery = "SELECT id FROM stocks WHERE ticker = ?";
+            if ($stmt = $mydb->prepare($checkQuery)) {
+                $stmt->bind_param("s", $ticker);
                 $stmt->execute();
                 $result = $stmt->get_result();
+                $stockExists = ($result->num_rows > 0);
+                $stmt->close();
+            } else {
+                return ["status" => "error", "message" => "Database query error: " . $mydb->error];
+            }
         
-                if ($result->num_rows > 0) {
-                    return ["status" => "success", "data" => $result->fetch_assoc()];
+            //Update if exists, insert if not
+            if ($stockExists) {
+                // Update stock in the database
+                $updateQuery = "UPDATE stocks 
+                                SET price = ?, timestamp = ?, `52weekchangepercent` = ?, `52weekhigh` = ?, `52weeklow` = ?, marketcap = ?, region = ?, currency = ? 
+                                WHERE ticker = ?";
+                if ($stmt = $mydb->prepare($updateQuery)) {
+                    $stmt->bind_param("dssdddsss", $price, $timestamp, $weekChange, $weekHigh, $weekLow, $marketCap, $region, $currency, $ticker);
+                    $stmt->execute();
+                    $stmt->close();
+                } else {
+                    return ["status" => "error", "message" => "Database update error: " . $mydb->error];
+                }
+            } else {
+                // Insert new stock into database
+                $insertQuery = "INSERT INTO stocks (ticker, company, price, timestamp, `52weekchangepercent`, `52weekhigh`, `52weeklow`, marketcap, region, currency) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                if ($stmt = $mydb->prepare($insertQuery)) {
+                    $stmt->bind_param("ssdsdddsss", $ticker, $company, $price, $timestamp, $weekChange, $weekHigh, $weekLow, $marketCap, $region, $currency);
+                    $stmt->execute();
+                    $stmt->close();
+                } else {
+                    return ["status" => "error", "message" => "Database insert error: " . $mydb->error];
                 }
             }
         
-            return ["status" => "error", "message" => "Stock not found after multiple retries."];
+            // Step 6: Return success response
+            return ["status" => "success", "message" => "Stock data updated successfully", "data" => $stockData];
         
-        case "store_stock":
-            if (!isset($request['data']['ticker'], $request['data']['company'], $request['data']['price'])) {
-                return ["status" => "error", "message" => "Missing required stock data fields."];
+        case "get_balance":
+            if (!isset($request['data']['username'])) {
+                return ["status" => "error", "message" => "Username not provided"];
             }
-            
-            $ticker = strtoupper(trim($request['data']['ticker']));
-            $company = trim($request['data']['company']);
-            $price = floatval($request['data']['price']);
-            $timestamp = date("Y-m-d H:i:s");
-            $weekChange = $request['data']['52weekchangepercent'] ?? null;
-            $weekHigh = $request['data']['52weekhigh'] ?? null;
-            $weekLow = $request['data']['52weeklow'] ?? null;
-            $marketCap = $request['data']['marketcap'] ?? null;
-            $region = $request['data']['region'] ?? 'N/A';
-            $currency = $request['data']['currency'] ?? 'N/A';
-            
-            // Check if stock exists
-            $checkQuery = "SELECT id FROM stocks WHERE ticker = ?";
-            $stmt = $mydb->prepare($checkQuery);
-            $stmt->bind_param("s", $ticker);
-            $stmt->execute();
+
+            $username = trim($request['data']['username']);
+            error_log("Fetching balance for user: " . $username);
+
+            $query = "SELECT balance FROM users WHERE username = ?";
+            $stmt = $mydb->prepare($query);
+            if (!$stmt) {
+                return ["status" => "error", "message" => "Database query preparation failed"];
+            }
+
+            $stmt->bind_param("s", $username);
+            if (!$stmt->execute()) {
+                return ["status" => "error", "message" => "Query execution failed"];
+            }
+
             $result = $stmt->get_result();
-            
             if ($result->num_rows > 0) {
-                // Update existing stock data
-                $updateQuery = "UPDATE stocks SET price = ?, timestamp = ?, `52weekchangepercent` = ?, `52weekhigh` = ?, `52weeklow` = ?, marketcap = ?, region = ?, currency = ? WHERE ticker = ?";
-                $stmt = $mydb->prepare($updateQuery);
-                $stmt->bind_param("dssdddsss", $price, $timestamp, $weekChange, $weekHigh, $weekLow, $marketCap, $region, $currency, $ticker);
-                return $stmt->execute() ? ["status" => "success", "message" => "Stock updated"] : ["status" => "error", "message" => "Update failed"];
+                $userData = $result->fetch_assoc();
+                return ["status" => "success", "balance" => $userData["balance"]];
             } else {
-                // Insert new stock
-                $insertQuery = "INSERT INTO stocks (ticker, company, price, timestamp, `52weekchangepercent`, `52weekhigh`, `52weeklow`, marketcap, region, currency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $mydb->prepare($insertQuery);
-                $stmt->bind_param("ssdsdddsss", $ticker, $company, $price, $timestamp, $weekChange, $weekHigh, $weekLow, $marketCap, $region, $currency);
-                return $stmt->execute() ? ["status" => "success", "message" => "Stock stored"] : ["status" => "error", "message" => "Insert failed"];
+                return ["status" => "error", "message" => "User not found"];
             }
-                case "get_balance":
-                    if (!isset($request['data']['username'])) {
-                        return ["status" => "error", "message" => "Username not provided"];
-                    }
-        
-                    $username = trim($request['data']['username']);
-                    error_log("Fetching balance for user: " . $username);
-        
-                    $query = "SELECT balance FROM users WHERE username = ?";
-                    $stmt = $mydb->prepare($query);
-                    if (!$stmt) {
-                        return ["status" => "error", "message" => "Database query preparation failed"];
-                    }
-        
-                    $stmt->bind_param("s", $username);
-                    if (!$stmt->execute()) {
-                        return ["status" => "error", "message" => "Query execution failed"];
-                    }
-        
-                    $result = $stmt->get_result();
-                    if ($result->num_rows > 0) {
-                        $userData = $result->fetch_assoc();
-                        return ["status" => "success", "balance" => $userData["balance"]];
-                    } else {
-                        return ["status" => "error", "message" => "User not found"];
-                    }
         case "register":
             $table = $request['table'];
             $columns = implode(", ", array_keys($request['data']));
