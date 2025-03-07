@@ -6,7 +6,7 @@ function fetchStockData($ticker)
 {
     $client = new rabbitMQClient("testRabbitMQ_response.ini", "responseServer");
     $request = [
-        'action' => 'get_stock',
+        'action' => 'retrieve_stock',
         'data' => ['ticker' => $ticker]
     ];
 
