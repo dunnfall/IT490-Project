@@ -9,21 +9,35 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">DEAA Stocks</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" href="../frontend/home.php">Home <span class="sr-only">(current)</span></a>
+                <!-- Home link -->
+                <li class="nav-item">
+                    <a class="nav-link" href="../frontend/home.php">Home</a>
                 </li>
+
+                <!-- Profile link -->
                 <li class="nav-item">
                     <a class="nav-link" href="../frontend/profile.php">Profile</a>
+                </li>
+
+                <!-- New links for Buy and Sell -->
+                <li class="nav-item">
+                    <a class="nav-link" href="../frontend/buy.php">Buy</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../frontend/sell.php">Sell</a>
                 </li>
             </ul>
         </div>
     </nav>
 
+    <!-- Optional JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
