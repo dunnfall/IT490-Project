@@ -1,14 +1,10 @@
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE); // Hide deprecation warnings
 header('Content-Type: application/json');
+
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);  // Hide deprecation warnings
-
-
-// Load RabbitMQ config
-$ini = parse_ini_file("/home/website/IT490-Project/testRabbitMQ.ini");
 
 // Validate input
 if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
@@ -17,36 +13,31 @@ if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
 }
 
 $ticker = strtoupper(trim($_GET['ticker']));
-error_log("Fetching ticker for user: " . $ticker);
+error_log("Stock Handler: Received ticker request for " . $ticker);
 
 // Initialize RabbitMQ client
 $client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
-error_log("Fetching ticker for user still working here: " . $ticker);
+error_log("Stock Handler: Sending 'retrieve_stock' request for " . $ticker);
 
-// Check if stock exists in the database
-$request = ['action' => 'get_stock', 'data' => ['ticker' => $ticker]];
-error_log("Fetching ticker for user is it still working?: " . $ticker);
+//Send single request to "retrieve_stock"
+$request = ['action' => 'retrieve_stock', 'data' => ['ticker' => $ticker]];
 $response = $client->send_request($request);
-error_log("Fetching ticker for user: How about now " . $ticker);
 
-if ($response && isset($response['status']) && $response['status'] === 'success') {
-    echo json_encode($response['data']);
-    exit();
-}
-error_log("Fetching ticker for user: IS it failing yet " . $ticker);
-// If stock is missing, request a new stock entry
-$updateRequest = ['action' => 'retrieve_stock', 'data' => ['ticker' => $ticker]];
-$updateResponse = $client->send_request($updateRequest);
-
-error_log("For sure has failed " . $ticker);
-
-if (!$updateResponse || $updateResponse['status'] !== 'success') {
-    echo json_encode(['error' => 'Stock not found and failed to retrieve.']);
+//Check if any response was received
+if (!$response) {
+    error_log("ERROR: No response from 'retrieve_stock' for " . $ticker);
+    echo json_encode(['error' => 'No response received from stock retrieval.']);
     exit();
 }
 
-error_log("Defintly now " . $ticker);
+//Check if response indicates success
+if (!isset($response['status']) || $response['status'] !== 'success') {
+    error_log("ERROR: 'retrieve_stock' failed for " . $ticker . " => " . json_encode($response));
+    echo json_encode(['error' => 'Stock retrieval failed.']);
+    exit();
+}
 
-// Return the newly added stock data
-echo json_encode($updateResponse['data']);
-?>
+//Return the stock data
+error_log("Stock Handler: Successfully retrieved stock => " . json_encode($response['data']));
+echo json_encode($response['data']);
+exit();

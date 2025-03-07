@@ -69,7 +69,7 @@ function processRequest($request) {
                 return ["status" => "error", "message" => "Ticker symbol is required"];
             }
             $ticker = strtoupper(trim($request['data']['ticker']));
-            error_log("Fetching ticker for user: " . $ticker);
+            error_log(message: "Fetching ticker for user: " . $ticker);
             return fetchStockData($ticker);
 
         default:
