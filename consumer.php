@@ -201,6 +201,187 @@ function processRequest($request)
                 return ["status" => "error", "message" => "User not found."];
             }
 
+        case "buy_stock":
+            /*
+                Expects:
+                $request['data'] = [
+                    'username'   => 'someuser',
+                    'ticker'     => 'AAPL',
+                    'quantity'   => 10,
+                    'orderType'  => 'MARKET' or 'LIMIT',
+                    'limitPrice' => 150.00 (only if orderType == 'LIMIT')
+                ];
+            */
+            if (!isset($request['data']['username'], $request['data']['ticker'], $request['data']['quantity'], $request['data']['orderType'])) {
+                return ["status" => "error", "message" => "Missing fields for buy_stock (username, ticker, quantity, orderType)."];
+            }
+        
+            $username   = trim($request['data']['username']);
+            $ticker     = strtoupper(trim($request['data']['ticker']));
+            $quantity   = (int)$request['data']['quantity'];
+            $orderType  = strtoupper(trim($request['data']['orderType']));
+            $limitPrice = isset($request['data']['limitPrice']) ? (float)$request['data']['limitPrice'] : 0.0;
+        
+            // 1) Get current stock price from 'stocks' table
+            $stmt = $mydb->prepare("SELECT price FROM stocks WHERE ticker = ? LIMIT 1");
+            $stmt->bind_param("s", $ticker);
+            $stmt->execute();
+            $resPrice = $stmt->get_result();
+            if ($resPrice->num_rows < 1) {
+                return ["status" => "error", "message" => "Ticker '$ticker' not found in 'stocks' table."];
+            }
+            $rowPrice     = $resPrice->fetch_assoc();
+            $currentPrice = (float)$rowPrice['price'];
+        
+            // 2) Get user balance
+            $stmt = $mydb->prepare("SELECT balance FROM users WHERE username = ? LIMIT 1");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $resUser = $stmt->get_result();
+            if ($resUser->num_rows < 1) {
+                return ["status" => "error", "message" => "User '$username' not found in 'users' table."];
+            }
+            $rowUser  = $resUser->fetch_assoc();
+            $userBal  = (float)$rowUser['balance'];
+        
+            // 3) Market or Limit?
+            if ($orderType === 'MARKET') {
+                // -- MARKET BUY --
+                $totalCost = $currentPrice * $quantity;
+                if ($userBal < $totalCost) {
+                    return ["status" => "error", "message" => "Insufficient balance for Market Buy: Need $totalCost, have $userBal."];
+                }
+        
+                // Deduct balance
+                $newBal = $userBal - $totalCost;
+                $stmt   = $mydb->prepare("UPDATE users SET balance = ? WHERE username = ?");
+                $stmt->bind_param("ds", $newBal, $username);
+                $stmt->execute();
+        
+                // (Optional) Insert a record in an 'orders' or 'transactions' table
+                // Example:
+                // $stmt = $mydb->prepare("INSERT INTO orders (username, ticker, quantity, price, order_type, created_at)
+                //                        VALUES (?, ?, ?, ?, 'MARKET_BUY', NOW())");
+                // $stmt->bind_param("ssid", $username, $ticker, $quantity, $currentPrice);
+                // $stmt->execute();
+        
+                return ["status" => "success", "message" => "Market Buy executed successfully."];
+        
+            } elseif ($orderType === 'LIMIT') {
+                // -- LIMIT BUY --
+                // Decide if you want to reserve funds now or only check upon execution.
+                // Example: Reserve them now
+                $totalCost = $limitPrice * $quantity;
+                if ($userBal < $totalCost) {
+                    return ["status" => "error", "message" => "Insufficient balance for Limit Buy: Need $totalCost, have $userBal."];
+                }
+        
+                // Deduct or "hold" the balance
+                $newBal = $userBal - $totalCost;
+                $stmt   = $mydb->prepare("UPDATE users SET balance = ? WHERE username = ?");
+                $stmt->bind_param("ds", $newBal, $username);
+                $stmt->execute();
+        
+                // Insert the limit order in a 'limit_orders' table
+                // (You must create this table if you haven't yet)
+                $stmt = $mydb->prepare("
+                    INSERT INTO limit_orders (username, ticker, limit_price, quantity, is_buy, created_at)
+                    VALUES (?, ?, ?, ?, 1, NOW())
+                ");
+                $stmt->bind_param("ssdi", $username, $ticker, $limitPrice, $quantity);
+                $stmt->execute();
+        
+                return ["status" => "success", "message" => "Limit Buy placed (pending execution)."];
+            } else {
+                return ["status" => "error", "message" => "Invalid orderType for buy_stock. Must be 'MARKET' or 'LIMIT'."];
+            }
+        
+            break; // end buy_stock
+        
+        
+        case "sell_stock":
+            /*
+                Expects:
+                $request['data'] = [
+                    'username'   => 'someuser',
+                    'ticker'     => 'AAPL',
+                    'quantity'   => 10,
+                    'orderType'  => 'MARKET' or 'LIMIT',
+                    'limitPrice' => 150.00 (only if orderType == 'LIMIT')
+                ];
+            */
+            if (!isset($request['data']['username'], $request['data']['ticker'], $request['data']['quantity'], $request['data']['orderType'])) {
+                return ["status" => "error", "message" => "Missing fields for sell_stock (username, ticker, quantity, orderType)."];
+            }
+        
+            $username   = trim($request['data']['username']);
+            $ticker     = strtoupper(trim($request['data']['ticker']));
+            $quantity   = (int)$request['data']['quantity'];
+            $orderType  = strtoupper(trim($request['data']['orderType']));
+            $limitPrice = isset($request['data']['limitPrice']) ? (float)$request['data']['limitPrice'] : 0.0;
+        
+            // 1) Get current stock price
+            $stmt = $mydb->prepare("SELECT price FROM stocks WHERE ticker = ? LIMIT 1");
+            $stmt->bind_param("s", $ticker);
+            $stmt->execute();
+            $resPrice = $stmt->get_result();
+            if ($resPrice->num_rows < 1) {
+                return ["status" => "error", "message" => "Ticker '$ticker' not found in 'stocks' table."];
+            }
+            $rowPrice     = $resPrice->fetch_assoc();
+            $currentPrice = (float)$rowPrice['price'];
+        
+            // 2) Get user balance
+            $stmt = $mydb->prepare("SELECT balance FROM users WHERE username = ? LIMIT 1");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $resUser = $stmt->get_result();
+            if ($resUser->num_rows < 1) {
+                return ["status" => "error", "message" => "User '$username' not found in 'users' table."];
+            }
+            $rowUser = $resUser->fetch_assoc();
+            $userBal = (float)$rowUser['balance'];
+        
+            // (Optional) Check if user actually owns the shares if you have a 'portfolio' table
+        
+            // 3) Market or Limit?
+            if ($orderType === 'MARKET') {
+                // -- MARKET SELL --
+                $totalProceeds = $currentPrice * $quantity;
+                $newBal        = $userBal + $totalProceeds;
+        
+                // Update user balance
+                $stmt = $mydb->prepare("UPDATE users SET balance = ? WHERE username = ?");
+                $stmt->bind_param("ds", $newBal, $username);
+                $stmt->execute();
+        
+                // (Optional) Insert record in 'orders' or 'transactions'
+                // $stmt = $mydb->prepare("INSERT INTO orders (username, ticker, quantity, price, order_type, created_at)
+                //                        VALUES (?, ?, ?, ?, 'MARKET_SELL', NOW())");
+                // $stmt->bind_param("ssid", $username, $ticker, $quantity, $currentPrice);
+                // $stmt->execute();
+        
+                return ["status" => "success", "message" => "Market Sell executed successfully."];
+        
+            } elseif ($orderType === 'LIMIT') {
+                // -- LIMIT SELL --
+                // Typically, we do NOT hold or deduct anything from the user’s balance for a sell limit.
+                // But you might want to confirm the user has enough shares in their portfolio.
+        
+                $stmt = $mydb->prepare("
+                    INSERT INTO limit_orders (username, ticker, limit_price, quantity, is_buy, created_at)
+                    VALUES (?, ?, ?, ?, 0, NOW())
+                ");
+                $stmt->bind_param("ssdi", $username, $ticker, $limitPrice, $quantity);
+                $stmt->execute();
+        
+                return ["status" => "success", "message" => "Limit Sell placed (pending execution)."];
+            } else {
+                return ["status" => "error", "message" => "Invalid orderType for sell_stock. Must be 'MARKET' or 'LIMIT'."];
+            }
+        
+            break; // end sell_stock
+
         case "verifyToken":
             if (!isset($request['token'])) {
                 return ["status" => "error", "message" => "No token provided"];
