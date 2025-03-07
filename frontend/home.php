@@ -1,14 +1,27 @@
 <?php
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-session_start();
+require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
-if (!isset($_SESSION['username'])) {
+// 1) Check for token in cookie
+$token = $_COOKIE['authToken'] ?? '';
+if (!$token) {
     header("Location: login.html");
     exit();
 }
 
-$username = $_SESSION['username'];
+// 2) Verify token with consumer
+$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$request = ['action'=>'verifyToken','token'=>$token];
+$response = $client->send_request($request);
+
+// 3) If invalid, redirect
+if (!isset($response['status']) || $response['status'] !== 'success') {
+    header("Location: login.html");
+    exit();
+}
+
+// If valid, we have $response['username']
+$username = $response['username'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -26,6 +39,12 @@ $username = $_SESSION['username'];
             let stockTable = document.getElementById("stockTable");
             let row = document.getElementById("stockRow");
             let stockDetails = document.getElementById("stockDetails");
+            let recommendationContainer = document.getElementById("recommendationContainer");
+            let recommendationText = document.getElementById("recommendationText");
+
+            console.log("Elements Found:", {
+                errorMessage, stockTable, row, stockDetails, recommendationContainer, recommendationText
+            });
 
             if (!ticker) {
                 errorMessage.textContent = "Please enter a valid ticker.";
@@ -35,6 +54,7 @@ $username = $_SESSION['username'];
             errorMessage.textContent = "Fetching stock data...";
             stockTable.style.display = "none";
             stockDetails.style.display = "none";
+            recommendationContainer.style.display = "none"; 
 
             try {
                 let response = await fetch(`../API/stock_handler.php?ticker=${ticker}`);
@@ -52,6 +72,12 @@ $username = $_SESSION['username'];
                                  <td>$${parseFloat(data.price).toFixed(2)}</td>
                                  <td>${data.timestamp}</td>
                                  <td><button onclick="showMoreInfo('${data.ticker}')">More Info</button></td>`;
+
+                let recommendationResponse = await fetch(`/backend/algorithm.php?ticker=${ticker}`);
+                let recommendationTextData = await recommendationResponse.text();
+
+                recommendationText.innerHTML = `<strong>Recommendation:</strong> ${recommendationTextData}`;
+                recommendationContainer.style.display = "block";
             } catch (error) {
                 console.error("Fetch Error:", error);
                 errorMessage.textContent = "Error fetching stock data.";
@@ -167,6 +193,11 @@ function renderStockChart(low, high, percentChange) {
             <h3>Stock Price Range (52 Weeks)</h3>
             <canvas id="stockChart"></canvas>
         </div>
+    </div>
+
+    <div id="recommendationContainer" style="display:none; margin-top:10px; border:1px solid #ddd; padding:10px;">
+        <h3>Stock Recommendation</h3>
+        <p id="recommendationText"></p>
     </div>
 
     <p id="errorMessage" style="color: red;"></p>
