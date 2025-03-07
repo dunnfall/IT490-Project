@@ -4,6 +4,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 header('Content-Type: application/json');
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);  // Hide deprecation warnings
+
 
 // Load RabbitMQ config
 $ini = parse_ini_file("/home/website/IT490-Project/testRabbitMQ.ini");
