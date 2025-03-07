@@ -1,37 +1,50 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 header('Content-Type: application/json');
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
+
+// Load RabbitMQ config
 $ini = parse_ini_file("/home/website/IT490-Project/testRabbitMQ.ini");
 
+// Validate input
 if (!isset($_GET['ticker']) || empty($_GET['ticker'])) {
     echo json_encode(['error' => 'No ticker provided.']);
     exit();
 }
 
 $ticker = strtoupper(trim($_GET['ticker']));
+error_log("Fetching ticker for user: " . $ticker);
 
+// Initialize RabbitMQ client
 $client = new rabbitMQClient("/home/website/IT490-Project/testRabbitMQ.ini", "testServer");
+error_log("Fetching ticker for user still working here: " . $ticker);
 
-// Step 1: Check if stock exists in the database first
+// Check if stock exists in the database
 $request = ['action' => 'get_stock', 'data' => ['ticker' => $ticker]];
+error_log("Fetching ticker for user is it still working?: " . $ticker);
 $response = $client->send_request($request);
+error_log("Fetching ticker for user: How about now " . $ticker);
 
 if ($response && isset($response['status']) && $response['status'] === 'success') {
     echo json_encode($response['data']);
     exit();
 }
+error_log("Fetching ticker for user: IS it failing yet " . $ticker);
+// If stock is missing, request a new stock entry
+$updateRequest = ['type' => 'retrieve_stock', 'data' => ['ticker' => $ticker]];
+$updateResponse = $client->send_request($updateRequest);
 
-echo json_encode(['error' => 'Stock not found. Requesting update.']);
-exit();
+error_log("For sure has failed " . $ticker);
 
-// Wait for the stock data to be updated in the database
-sleep(3);
-
-// Step 3: Fetch the stock from the database again
-$response = $client->send_request(['action' => 'get_stock', 'data' => ['ticker' => $ticker]]);
-if ($response && isset($response['status']) && $response['status'] === 'success') {
-    echo json_encode($response['data']);
-} else {
-    echo json_encode(['error' => 'Stock not found or request failed.']);
+if (!$updateResponse || $updateResponse['status'] !== 'success') {
+    echo json_encode(['error' => 'Stock not found and failed to retrieve.']);
+    exit();
 }
+
+error_log("Defintly now " . $ticker);
+
+// Return the newly added stock data
+echo json_encode($updateResponse['data']);
 ?>
