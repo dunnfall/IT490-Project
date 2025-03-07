@@ -35,7 +35,7 @@ if ($response && isset($response['status']) && $response['status'] === 'success'
 }
 error_log("Fetching ticker for user: IS it failing yet " . $ticker);
 // If stock is missing, request a new stock entry
-$updateRequest = ['type' => 'retrieve_stock', 'data' => ['ticker' => $ticker]];
+$updateRequest = ['action' => 'retrieve_stock', 'data' => ['ticker' => $ticker]];
 $updateResponse = $client->send_request($updateRequest);
 
 error_log("For sure has failed " . $ticker);
