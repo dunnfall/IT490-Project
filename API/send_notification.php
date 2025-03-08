@@ -10,17 +10,19 @@ use PHPMailer\PHPMailer\Exception;
 
 $token = $_COOKIE['authToken'] ?? '';
 if (!$token) {
+    // If no token, redirect or exit
     header("Location: ../frontend/login.html");
     exit();
 }
 
-// Only proceed if user clicked the button
-if (!isset($_POST['send_notification'])) {
-    header("Location: ../frontend/profile.php");
-    exit();
-}
+// 1) Determine if this is a "trade notification" or a "generic" one
+$tradeType = $_REQUEST['tradeType'] ?? ''; // e.g. "BUY" or "SELL"
+$ticker    = $_REQUEST['ticker']    ?? '';
+$quantity  = $_REQUEST['quantity']  ?? '';
+$totalCost = $_REQUEST['totalCost'] ?? '';
+$newBal    = $_REQUEST['newBal']    ?? '';
 
-// 1) Use RabbitMQ to verify token & get user email
+// 2) Create RabbitMQ client and request "verifyAndGetEmail"
 $client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 $request = [
     "action" => "verifyAndGetEmail",
@@ -28,15 +30,37 @@ $request = [
 ];
 $response = $client->send_request($request);
 
-// 2) If invalid, redirect with an error
+// 3) If invalid token, redirect with an error
 if (!isset($response["status"]) || $response["status"] !== "success") {
     header("Location: ../frontend/profile.php?error=" . urlencode($response["message"] ?? "Invalid token"));
     exit();
 }
-
 $userEmail = $response["email"];
 
-// 3) Send the email via PHPMailer
+// 4) Build the email subject/body
+if ($tradeType && $ticker && $quantity) {
+    // It's a trade notification
+    $subject = "Trade Notification: $tradeType $ticker";
+    $body    = "<p>Hello!</p>";
+    $body   .= "<p>You have just executed a <strong>$tradeType</strong> order.</p>";
+    $body   .= "<ul>";
+    $body   .= "<li>Ticker: $ticker</li>";
+    $body   .= "<li>Quantity: $quantity</li>";
+    if ($totalCost !== '') {
+        $body .= "<li>Total Cost/Proceeds: \$$totalCost</li>";
+    }
+    if ($newBal !== '') {
+        $body .= "<li>New Balance: \$$newBal</li>";
+    }
+    $body .= "</ul>";
+    $body .= "<p>Thank you for using our service!</p>";
+} else {
+    // Fallback: generic notification (the old logic)
+    $subject = 'Notification from My App';
+    $body    = "<p>Hello!</p><p>This is a generic notification email to your account.</p>";
+}
+
+// 5) Send the email via PHPMailer
 $mail = new PHPMailer(true);
 try {
     $mail->isSMTP();
@@ -51,13 +75,12 @@ try {
     $mail->addAddress($userEmail);
 
     $mail->isHTML(true);
-    $mail->Subject = 'Notification from My App';
-    $mail->Body    = "<p>Hello!</p><p>This is a notification email to your account.</p>";
-    $mail->AltBody = "Hello!\n\nThis is a notification email to your account.";
+    $mail->Subject = $subject;
+    $mail->Body    = $body;
+    $mail->AltBody = strip_tags($body);
 
     $mail->send();
-
-    // 4) Redirect with success
+    // 6) Redirect with success
     header("Location: ../frontend/profile.php?success=1");
     exit();
 } catch (Exception $e) {

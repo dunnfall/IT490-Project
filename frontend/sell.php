@@ -1,48 +1,46 @@
 <?php
 // sell.php
 
-// 1) Check for auth token
 $token = $_COOKIE['authToken'] ?? '';
 if (!$token) {
     header("Location: login.html");
     exit();
 }
 
-// 2) Load RabbitMQ client/config
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
 require_once "/home/website/IT490-Project/testRabbitMQ.ini";
-// Same change here, using testRabbitMQ.ini and testServer
 
-// 3) Verify token + get balance
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$verifyRequest = [
-    "action" => "verifyAndGetBalance",
-    "token"  => $token
-];
-$verifyResponse = $client->send_request($verifyRequest);
+$client   = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$username = "";
+$balance  = 0.00;
+$message  = "";
 
-if (!isset($verifyResponse["status"]) || $verifyResponse["status"] !== "success") {
-    header("Location: login.html");
-    exit();
-}
+// On GET, verify token + get balance
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $verifyReq = [
+        "action" => "verifyAndGetBalance",
+        "token"  => $token
+    ];
+    $verifyResp = $client->send_request($verifyReq);
 
-$username = $verifyResponse["username"];
-$balance  = $verifyResponse["balance"];
-
-// 4) Check if form submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $ticker     = $_POST['ticker']     ?? '';
-    $quantity   = $_POST['quantity']   ?? '';
-    $orderType  = $_POST['orderType']  ?? 'MARKET';
-    $limitPrice = $_POST['limitPrice'] ?? 0;
-
-    if (!$ticker || !$quantity) {
-        header("Location: sell.php?error=" . urlencode("Please provide a ticker and quantity."));
+    if (isset($verifyResp["status"]) && $verifyResp["status"] === "success") {
+        $username = $verifyResp["username"];
+        $balance  = (float)$verifyResp["balance"];
+    } else {
+        header("Location: login.html");
         exit();
     }
+}
 
-    // 5) Send RabbitMQ request to "sell_stock"
-    $sellRequest = [
+// On POST, place the sell order
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username   = $_POST['username']   ?? '';
+    $ticker     = $_POST['ticker']     ?? '';
+    $quantity   = $_POST['quantity']   ?? 0;
+    $orderType  = $_POST['orderType']  ?? 'MARKET';
+    $limitPrice = $_POST['limitPrice'] ?? 0.0;
+
+    $sellReq = [
         "action" => "sell_stock",
         "data"   => [
             "username"   => $username,
@@ -52,16 +50,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "limitPrice" => (float)$limitPrice
         ]
     ];
-    $sellResponse = $client->send_request($sellRequest);
+    $sellResp = $client->send_request($sellReq);
 
-    // 6) Handle response
-    if (isset($sellResponse["status"]) && $sellResponse["status"] === "success") {
-        header("Location: sell.php?success=" . urlencode($sellResponse["message"]));
+    if (isset($sellResp["status"]) && $sellResp["status"] === "success") {
+        // If success, get updated balance from the consumer response
+        $balance = isset($sellResp["newBalance"]) ? (float)$sellResp["newBalance"] : 0.0;
+        $message = "Sell success: " . $sellResp["message"];
+
+        // Redirect to send_notification.php with trade details
+        $qs = http_build_query([
+            'tradeType' => 'SELL',
+            'ticker'    => $ticker,
+            'quantity'  => $quantity,
+            'newBal'    => $balance
+        ]);
+        header("Location: ../API/send_notification.php?$qs");
         exit();
     } else {
-        $errorMsg = $sellResponse["message"] ?? "Failed to sell stock.";
-        header("Location: sell.php?error=" . urlencode($errorMsg));
-        exit();
+        $message = "Sell error: " . ($sellResp["message"] ?? "Unknown");
     }
 }
 ?>
@@ -77,14 +83,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p>Logged in as: <strong><?php echo htmlspecialchars($username); ?></strong></p>
     <p>Your current balance: $<?php echo number_format($balance, 2); ?></p>
 
-    <?php if (isset($_GET['success'])): ?>
-        <p style="color: green;"><?php echo htmlspecialchars($_GET['success']); ?></p>
-    <?php endif; ?>
-    <?php if (isset($_GET['error'])): ?>
-        <p style="color: red;"><?php echo htmlspecialchars($_GET['error']); ?></p>
+    <?php if (!empty($message)): ?>
+        <p><?php echo htmlspecialchars($message); ?></p>
     <?php endif; ?>
 
-    <form action="sell.php" method="POST">
+    <!-- Sell form -->
+    <form method="POST">
+        <input type="hidden" name="username" value="<?php echo htmlspecialchars($username); ?>">
+
         <label for="ticker">Ticker:</label>
         <input type="text" id="ticker" name="ticker" required>
 
