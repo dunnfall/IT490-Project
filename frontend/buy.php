@@ -1,72 +1,78 @@
 <?php
 // buy.php
 
-// 1) Check for an auth token in the cookie
+// 1) Check if the user has a valid auth token
 $token = $_COOKIE['authToken'] ?? '';
 if (!$token) {
-    // If no token, redirect to login
     header("Location: login.html");
     exit();
 }
 
-// 2) Load RabbitMQ client/config
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
-require_once "/home/website/IT490-Project/testRabbitMQ.ini"; 
-// IMPORTANT: Now using testRabbitMQ.ini instead of testRabbitMQ_response.ini
+require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 
-// 3) Verify the token + get user balance
-$client = new rabbitMQClient("testRabbitMQ.ini", "testServer");
-$verifyRequest = [
-    "action" => "verifyAndGetBalance",
-    "token"  => $token
-];
-$verifyResponse = $client->send_request($verifyRequest);
+$client   = new rabbitMQClient("testRabbitMQ.ini", "testServer");
+$username = "";
+$balance  = 0.00;
+$message  = "";
 
-if (!isset($verifyResponse["status"]) || $verifyResponse["status"] !== "success") {
-    // Invalid token => redirect to login
-    header("Location: login.html");
-    exit();
-}
+// 2) On GET, verify token + get balance
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $verifyReq = [
+        "action" => "verifyAndGetBalance",
+        "token"  => $token
+    ];
+    $verifyResp = $client->send_request($verifyReq);
 
-// 4) We have the username and balance
-$username = $verifyResponse["username"];
-$balance  = $verifyResponse["balance"];
-
-// 5) Check if the form was submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Gather form inputs
-    $ticker     = $_POST['ticker']     ?? '';
-    $quantity   = $_POST['quantity']   ?? '';
-    $orderType  = $_POST['orderType']  ?? 'MARKET';
-    $limitPrice = $_POST['limitPrice'] ?? 0;
-
-    // Basic validation
-    if (!$ticker || !$quantity) {
-        header("Location: buy.php?error=" . urlencode("Please provide a ticker and quantity."));
+    if (isset($verifyResp["status"]) && $verifyResp["status"] === "success") {
+        $username = $verifyResp["username"];
+        $balance  = (float)$verifyResp["balance"];
+    } else {
+        // Invalid token => redirect
+        header("Location: login.html");
         exit();
     }
+}
 
-    // 6) Build and send a RabbitMQ request to "buy_stock"
-    $buyRequest = [
+// 3) On POST, place the buy order
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve hidden username (preserved from GET)
+    $username   = $_POST['username']   ?? '';
+    $ticker     = $_POST['ticker']     ?? '';
+    $quantity   = $_POST['quantity']   ?? 0;
+    $orderType  = $_POST['orderType']  ?? 'MARKET';
+    $limitPrice = $_POST['limitPrice'] ?? 0.0;
+
+    // Build request for "buy_stock"
+    $buyReq = [
         "action" => "buy_stock",
         "data"   => [
             "username"   => $username,
             "ticker"     => strtoupper(trim($ticker)),
             "quantity"   => (int)$quantity,
-            "orderType"  => strtoupper($orderType), // 'MARKET' or 'LIMIT'
+            "orderType"  => strtoupper($orderType),
             "limitPrice" => (float)$limitPrice
         ]
     ];
-    $buyResponse = $client->send_request($buyRequest);
+    $buyResp = $client->send_request($buyReq);
 
-    // 7) Handle the response
-    if (isset($buyResponse["status"]) && $buyResponse["status"] === "success") {
-        header("Location: buy.php?success=" . urlencode($buyResponse["message"]));
+    if (isset($buyResp["status"]) && $buyResp["status"] === "success") {
+        // 4) On success, get the updated balance (if returned by the consumer)
+        $balance = isset($buyResp["newBalance"]) ? (float)$buyResp["newBalance"] : 0.0;
+        $message = "Buy success: " . $buyResp["message"];
+
+        // 5) Redirect to send_notification.php with trade details
+        // We'll pass tradeType=BUY, ticker, quantity, newBal so the email can be customized
+        $qs = http_build_query([
+            'tradeType' => 'BUY',
+            'ticker'    => $ticker,
+            'quantity'  => $quantity,
+            'newBal'    => $balance
+        ]);
+        header("Location: ../API/send_notification.php?$qs");
         exit();
     } else {
-        $errorMsg = $buyResponse["message"] ?? "Failed to buy stock.";
-        header("Location: buy.php?error=" . urlencode($errorMsg));
-        exit();
+        $message = "Buy error: " . ($buyResp["message"] ?? "Unknown");
     }
 }
 ?>
@@ -82,14 +88,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p>Logged in as: <strong><?php echo htmlspecialchars($username); ?></strong></p>
     <p>Your current balance: $<?php echo number_format($balance, 2); ?></p>
 
-    <?php if (isset($_GET['success'])): ?>
-        <p style="color: green;"><?php echo htmlspecialchars($_GET['success']); ?></p>
-    <?php endif; ?>
-    <?php if (isset($_GET['error'])): ?>
-        <p style="color: red;"><?php echo htmlspecialchars($_GET['error']); ?></p>
+    <?php if (!empty($message)): ?>
+        <p><?php echo htmlspecialchars($message); ?></p>
     <?php endif; ?>
 
-    <form action="buy.php" method="POST">
+    <!-- Buy form -->
+    <form method="POST">
+        <!-- Preserve username across POST -->
+        <input type="hidden" name="username" value="<?php echo htmlspecialchars($username); ?>">
+
         <label for="ticker">Ticker:</label>
         <input type="text" id="ticker" name="ticker" required>
 
