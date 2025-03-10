@@ -9,7 +9,10 @@ if (!$token) {
 }
 
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
-require_once "/home/website/IT490-Project/testRabbitMQ.ini";
+$ini = parse_ini_file("/home/website/IT490-Project/testRabbitMQ.ini");
+if (!$ini) {
+    die("Error: Unable to load configuration file.");
+}
 
 $client   = new rabbitMQClient("testRabbitMQ.ini", "testServer");
 $username = "";
@@ -62,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Buy success: " . $buyResp["message"];
 
         // 5) Redirect to send_notification.php with trade details
-        // We'll pass tradeType=BUY, ticker, quantity, newBal so the email can be customized
         $qs = http_build_query([
             'tradeType' => 'BUY',
             'ticker'    => $ticker,
@@ -77,50 +79,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buy Stocks</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
     <?php require(__DIR__ . "/../partials/nav.php"); ?>
 </head>
-<body>
-    <h1>Buy Stocks</h1>
+<body class="bg-light">
 
-    <p>Logged in as: <strong><?php echo htmlspecialchars($username); ?></strong></p>
-    <p>Your current balance: $<?php echo number_format($balance, 2); ?></p>
+    <div class="container mt-5">
+        <div class="card shadow p-4">
+            <h2 class="text-center">Buy Stocks</h2>
+            
+            <p class="text-center"><strong>Logged in as:</strong> <?php echo htmlspecialchars($username); ?></p>
+            <p class="text-center"><strong>Your Balance:</strong> $<?php echo number_format($balance, 2); ?></p>
 
-    <?php if (!empty($message)): ?>
-        <p><?php echo htmlspecialchars($message); ?></p>
-    <?php endif; ?>
+            <?php if (!empty($message)): ?>
+                <div class="alert <?php echo strpos($message, 'success') !== false ? 'alert-success' : 'alert-danger'; ?> text-center">
+                    <?php echo htmlspecialchars($message); ?>
+                </div>
+            <?php endif; ?>
 
-    <!-- Buy form -->
-    <form method="POST">
-        <!-- Preserve username across POST -->
-        <input type="hidden" name="username" value="<?php echo htmlspecialchars($username); ?>">
+            <form method="POST">
+                <input type="hidden" name="username" value="<?php echo htmlspecialchars($username); ?>">
 
-        <label for="ticker">Ticker:</label>
-        <input type="text" id="ticker" name="ticker" required>
+                <div class="form-group">
+                    <label for="ticker">Stock Ticker:</label>
+                    <input type="text" id="ticker" name="ticker" class="form-control" placeholder="Enter stock symbol" required>
+                </div>
 
-        <br><br>
+                <div class="form-group">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" class="form-control" min="1" required>
+                </div>
 
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" min="1" required>
+                <div class="form-group">
+                    <label for="orderType">Order Type:</label>
+                    <select id="orderType" name="orderType" class="form-control">
+                        <option value="MARKET">Market Order</option>
+                        <option value="LIMIT">Limit Order</option>
+                    </select>
+                </div>
 
-        <br><br>
+                <div class="form-group">
+                    <label for="limitPrice">Limit Price (For Limit Orders Only):</label>
+                    <input type="number" step="0.01" id="limitPrice" name="limitPrice" class="form-control" placeholder="Enter limit price">
+                </div>
 
-        <label for="orderType">Order Type:</label>
-        <select id="orderType" name="orderType">
-            <option value="MARKET">Market</option>
-            <option value="LIMIT">Limit</option>
-        </select>
+                <button type="submit" class="btn btn-primary btn-block">Buy</button>
+            </form>
+        </div>
+    </div>
 
-        <br><br>
-
-        <label for="limitPrice">Limit Price (if Limit Order):</label>
-        <input type="number" step="0.01" id="limitPrice" name="limitPrice" placeholder="0.00">
-
-        <br><br>
-
-        <button type="submit">Buy</button>
-    </form>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
