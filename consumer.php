@@ -279,6 +279,366 @@ function processRequest($request)
                 "balance" => $balance
             ];
 
+        case "buy_stock":
+            // 1) Validate input
+            if (!isset($request['data']['username'], $request['data']['ticker'], $request['data']['quantity'])) {
+                return ["status" => "error", "message" => "Missing buy_stock fields (username, ticker, quantity)."];
+            }
+            $username   = trim($request['data']['username']);
+            $ticker     = strtoupper(trim($request['data']['ticker']));
+            $quantity   = (int)$request['data']['quantity'];
+            $orderType  = strtoupper($request['data']['orderType'] ?? 'MARKET');
+            $limitPrice = (float)($request['data']['limitPrice'] ?? 0);
+        
+            // 2) Get user info
+            $stmt = $mydb->prepare("SELECT id, balance FROM users WHERE username = ? LIMIT 1");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $resUser = $stmt->get_result();
+            if ($resUser->num_rows < 1) {
+                return ["status" => "error", "message" => "User not found"];
+            }
+            $rowUser  = $resUser->fetch_assoc();
+            $userId   = (int)$rowUser['id'];
+            $balance  = (float)$rowUser['balance'];
+        
+            // 3) Check local DB for the stock
+            $stmt = $mydb->prepare("SELECT id, price FROM stocks WHERE ticker = ? LIMIT 1");
+            $stmt->bind_param("s", $ticker);
+            $stmt->execute();
+            $resStock = $stmt->get_result();
+        
+            $stockId      = null;
+            $currentPrice = 0.0;
+        
+            if ($resStock->num_rows > 0) {
+                // Found locally
+                $rowStock     = $resStock->fetch_assoc();
+                $stockId      = (int)$rowStock['id'];
+                $currentPrice = (float)$rowStock['price'];
+            } else {
+                // 4) Not found => fetch from DMZ
+                $stmt->close(); // close prior statement
+                error_log("Ticker '$ticker' not found locally. Requesting from DMZ...");
+        
+                // Make sure you have the correct path for rabbitMQLib.inc if not already included
+                require_once "rabbitMQLib.inc";
+                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                // Must match how your DMZ expects requests
+                $dmzRequest = [
+                    'type' => 'fetch_stock',
+                    'data' => ['ticker' => $ticker]
+                ];
+                $dmzResponse = $dmzClient->send_request($dmzRequest);
+        
+                if (!$dmzResponse || $dmzResponse['status'] !== 'success') {
+                    error_log("ERROR: DMZ fetch for '$ticker' failed");
+                    return ["status"=>"error","message"=>"Unable to fetch '$ticker' from DMZ."];
+                }
+        
+                // Insert into 'stocks'
+                $stockData = $dmzResponse['data'];
+                $company   = trim($stockData['company'] ?? '');
+                $price     = (float)($stockData['price'] ?? 0);
+                $timestamp = date("Y-m-d H:i:s");
+                $weekChange= $stockData['52weekchangepercent'] ?? null;
+                $weekHigh  = $stockData['52weekhigh'] ?? null;
+                $weekLow   = $stockData['52weeklow']  ?? null;
+                $marketCap = $stockData['marketcap']  ?? null;
+                $region    = $stockData['region']     ?? 'N/A';
+                $currency  = $stockData['currency']   ?? 'N/A';
+        
+                $insQ = "
+                    INSERT INTO stocks (ticker, company, price, timestamp,
+                                        `52weekchangepercent`, `52weekhigh`, `52weeklow`,
+                                        marketcap, region, currency)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ";
+                $stmt2 = $mydb->prepare($insQ);
+                if (!$stmt2) {
+                    error_log("DB insert prepare failed: " . $mydb->error);
+                    return ["status"=>"error","message"=>"Database insert failed."];
+                }
+                $stmt2->bind_param("ssdsdddsss",
+                    $ticker, $company, $price, $timestamp,
+                    $weekChange, $weekHigh, $weekLow,
+                    $marketCap, $region, $currency
+                );
+                $stmt2->execute();
+                $newId = $stmt2->insert_id;
+                $stmt2->close();
+        
+                // Now we have a new stock row
+                $stockId      = $newId;
+                $currentPrice = $price;
+            }
+        
+            // 5) Now proceed with the normal buy logic
+            if ($orderType === 'MARKET') {
+                $totalCost = $currentPrice * $quantity;
+                if ($balance < $totalCost) {
+                    return ["status" => "error", "message" => "Insufficient balance for Market Buy."];
+                }
+        
+                // Deduct user balance
+                $newBalance = $balance - $totalCost;
+                $stmt = $mydb->prepare("UPDATE users SET balance = ? WHERE id = ?");
+                $stmt->bind_param("di", $newBalance, $userId);
+                $stmt->execute();
+        
+                // Insert into user_stocks
+                $stmt = $mydb->prepare("
+                    INSERT INTO user_stocks (user_id, stock_id, purchase_price, quantity, purchase_date)
+                    VALUES (?, ?, ?, ?, NOW())
+                ");
+                $stmt->bind_param("iidi", $userId, $stockId, $currentPrice, $quantity);
+                $stmt->execute();
+        
+                return [
+                    "status"    => "success",
+                    "message"   => "Market Buy executed.",
+                    "newBalance"=> (float)$newBalance
+                ];
+            }
+            elseif ($orderType === 'LIMIT') {
+                // ...
+                return [
+                    "status"    => "success",
+                    "message"   => "Limit Buy placed (pending).",
+                    "newBalance"=> (float)$balance
+                ];
+            }
+            else {
+                return ["status" => "error", "message" => "Invalid orderType for buy_stock."];
+            }
+        
+            break;
+        
+        
+        case "sell_stock":
+            // 1) Validate input
+            if (!isset($request['data']['username'], $request['data']['ticker'], $request['data']['quantity'])) {
+                return ["status" => "error", "message" => "Missing sell_stock fields (username, ticker, quantity)."];
+            }
+            $username  = trim($request['data']['username']);
+            $ticker    = strtoupper(trim($request['data']['ticker']));
+            $quantity  = (int)$request['data']['quantity'];
+            $orderType = strtoupper($request['data']['orderType'] ?? 'MARKET');
+        
+            // 2) Get user info
+            $stmt = $mydb->prepare("SELECT id, balance FROM users WHERE username = ? LIMIT 1");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $resUser = $stmt->get_result();
+            if ($resUser->num_rows < 1) {
+                return ["status" => "error", "message" => "User not found"];
+            }
+            $rowUser  = $resUser->fetch_assoc();
+            $userId   = (int)$rowUser['id'];
+            $balance  = (float)$rowUser['balance'];
+        
+            // 3) Check local DB for the stock
+            $stmt = $mydb->prepare("SELECT id, price FROM stocks WHERE ticker = ? LIMIT 1");
+            $stmt->bind_param("s", $ticker);
+            $stmt->execute();
+            $resStock = $stmt->get_result();
+        
+            $stockId      = null;
+            $currentPrice = 0.0;
+        
+            if ($resStock->num_rows > 0) {
+                // Found locally
+                $rowStock     = $resStock->fetch_assoc();
+                $stockId      = (int)$rowStock['id'];
+                $currentPrice = (float)$rowStock['price'];
+            } else {
+                // 4) Not found => fetch from DMZ
+                $stmt->close();
+                error_log("Ticker '$ticker' not found locally. Requesting from DMZ...");
+        
+                require_once "rabbitMQLib.inc";
+                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzRequest = [
+                    'type' => 'fetch_stock',
+                    'data' => ['ticker' => $ticker]
+                ];
+                $dmzResponse = $dmzClient->send_request($dmzRequest);
+        
+                if (!$dmzResponse || $dmzResponse['status'] !== 'success') {
+                    error_log("ERROR: DMZ fetch for '$ticker' failed");
+                    return ["status"=>"error","message"=>"Unable to fetch '$ticker' from DMZ."];
+                }
+        
+                // Insert into 'stocks'
+                $stockData = $dmzResponse['data'];
+                $company   = trim($stockData['company'] ?? '');
+                $price     = (float)($stockData['price'] ?? 0);
+                $timestamp = date("Y-m-d H:i:s");
+                $weekChange= $stockData['52weekchangepercent'] ?? null;
+                $weekHigh  = $stockData['52weekhigh'] ?? null;
+                $weekLow   = $stockData['52weeklow']  ?? null;
+                $marketCap = $stockData['marketcap']  ?? null;
+                $region    = $stockData['region']     ?? 'N/A';
+                $currency  = $stockData['currency']   ?? 'N/A';
+        
+                $insQ = "
+                    INSERT INTO stocks (ticker, company, price, timestamp,
+                                        `52weekchangepercent`, `52weekhigh`, `52weeklow`,
+                                        marketcap, region, currency)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ";
+                $stmt2 = $mydb->prepare($insQ);
+                if (!$stmt2) {
+                    error_log("DB insert prepare failed: " . $mydb->error);
+                    return ["status"=>"error","message"=>"Database insert failed."];
+                }
+                $stmt2->bind_param("ssdsdddsss",
+                    $ticker, $company, $price, $timestamp,
+                    $weekChange, $weekHigh, $weekLow,
+                    $marketCap, $region, $currency
+                );
+                $stmt2->execute();
+                $newId = $stmt2->insert_id;
+                $stmt2->close();
+        
+                $stockId      = $newId;
+                $currentPrice = $price;
+            }
+        
+            // 5) Now proceed with the normal sell logic
+            if ($orderType === 'MARKET') {
+                $totalProceeds = $currentPrice * $quantity;
+                $newBalance    = $balance + $totalProceeds;
+        
+                // Update user balance
+                $stmt = $mydb->prepare("UPDATE users SET balance = ? WHERE id = ?");
+                $stmt->bind_param("di", $newBalance, $userId);
+                $stmt->execute();
+        
+                // Subtract from user_stocks
+                $stmt = $mydb->prepare("
+                    SELECT id, quantity
+                    FROM user_stocks
+                    WHERE user_id = ? AND stock_id = ?
+                    ORDER BY purchase_date ASC
+                    LIMIT 1
+                ");
+                $stmt->bind_param("ii", $userId, $stockId);
+                $stmt->execute();
+                $resStockRow = $stmt->get_result();
+                if ($resStockRow->num_rows < 1) {
+                    return ["status" => "error", "message" => "No holdings found for that stock."];
+                }
+        
+                $rowHold   = $resStockRow->fetch_assoc();
+                $rowHoldId = (int)$rowHold['id'];
+                $oldQty    = (int)$rowHold['quantity'];
+        
+                if ($oldQty < $quantity) {
+                    return ["status" => "error", "message" => "Not enough shares to sell."];
+                }
+        
+                $newQty = $oldQty - $quantity;
+                if ($newQty > 0) {
+                    $stmt = $mydb->prepare("UPDATE user_stocks SET quantity = ? WHERE id = ?");
+                    $stmt->bind_param("ii", $newQty, $rowHoldId);
+                    $stmt->execute();
+                } else {
+                    $stmt = $mydb->prepare("DELETE FROM user_stocks WHERE id = ?");
+                    $stmt->bind_param("i", $rowHoldId);
+                    $stmt->execute();
+                }
+        
+                return [
+                    "status"    => "success",
+                    "message"   => "Market Sell executed.",
+                    "newBalance"=> (float)$newBalance
+                ];
+            }
+            elseif ($orderType === 'LIMIT') {
+                // ...
+                return [
+                    "status"    => "success",
+                    "message"   => "Limit Sell placed (pending).",
+                    "newBalance"=> (float)$balance
+                ];
+            }
+            else {
+                return ["status" => "error", "message" => "Invalid orderType."];
+            }
+        
+            break;
+
+        case "verifyAndGetBalanceAndPortfolio":
+            // 1) Check if a token was provided
+            $token = $request['token'] ?? '';
+            if (!$token) {
+                return ["status" => "error", "message" => "No token provided"];
+            }
+        
+            // 2) Verify the token in 'tokens' table
+            $sqlToken = "SELECT username FROM tokens WHERE token = ? LIMIT 1";
+            $stmt = $mydb->prepare($sqlToken);
+            $stmt->bind_param("s", $token);
+            $stmt->execute();
+            $resToken = $stmt->get_result();
+        
+            if ($resToken->num_rows < 1) {
+                return ["status" => "error", "message" => "Invalid token"];
+            }
+        
+            // 3) Get the username
+            $row      = $resToken->fetch_assoc();
+            $username = $row['username'];
+        
+            // 4) Retrieve the user's balance from 'users' table
+            $sqlBalance = "SELECT id, balance FROM users WHERE username = ? LIMIT 1";
+            $stmt2      = $mydb->prepare($sqlBalance);
+            $stmt2->bind_param("s", $username);
+            $stmt2->execute();
+            $resBal = $stmt2->get_result();
+        
+            if ($resBal->num_rows < 1) {
+                return ["status" => "error", "message" => "User not found"];
+            }
+        
+            $rowBal   = $resBal->fetch_assoc();
+            $userId   = (int)$rowBal['id'];
+            $balance  = (float)$rowBal['balance'];
+        
+            // 5) Now retrieve the user's portfolio from user_stocks
+            //    We'll join with stocks to get ticker, current price, etc.
+            $sqlPortfolio = "
+                SELECT us.quantity, us.purchase_price, us.purchase_date,
+                        s.ticker, s.price AS current_price
+                FROM user_stocks us
+                JOIN stocks s ON us.stock_id = s.id
+                WHERE us.user_id = ?
+                ORDER BY us.purchase_date DESC
+            ";
+            $stmt3 = $mydb->prepare($sqlPortfolio);
+            $stmt3->bind_param("i", $userId);
+            $stmt3->execute();
+            $resPortfolio = $stmt3->get_result();
+        
+            $portfolioData = [];
+            while ($rowPort = $resPortfolio->fetch_assoc()) {
+                $portfolioData[] = [
+                    "ticker"         => $rowPort["ticker"],
+                    "quantity"       => (int)$rowPort["quantity"],
+                    "purchase_price" => (float)$rowPort["purchase_price"],
+                    "purchase_date"  => $rowPort["purchase_date"],
+                    "current_price"  => (float)$rowPort["current_price"]
+                ];
+            }
+        
+            // 6) Return a single response with both balance + portfolio
+            return [
+                "status"   => "success",
+                "username" => $username,
+                "balance"  => $balance,
+                "portfolio"=> $portfolioData
+            ];
         // Optionally add a "logout" case to remove token if needed
         // case "logout":
         //    ...
