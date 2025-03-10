@@ -54,14 +54,37 @@ foreach ($stockDataBatch as $ticker => $stockData) {
     $currency   = isset($stockData['currency']) ? $stockData['currency'] : 'N/A';
     
     // Prepare an update statement to refresh the stock record
-    $stmt = $mydb->prepare("UPDATE stocks SET company=?, price=?, timestamp=?, week_change=?, week_high=?, week_low=?, market_cap=?, region=?, currency=? WHERE ticker=?");
+    $stmt = $mydb->prepare("
+    UPDATE stocks
+    SET company = ?,
+        price = ?,
+        timestamp = ?,
+        52weekchangepercent = ?,
+        52weekhigh = ?,
+        52weeklow = ?,
+        marketcap = ?,
+        region = ?,
+        currency = ?
+    WHERE ticker = ?
+");
     if (!$stmt) {
         error_log("Prepare failed for ticker: $ticker. Error: " . $mydb->error);
         continue;
     }
     
     // Bind parameters:
-    $stmt->bind_param("sdsddddsss", $company, $price, $timestamp, $weekChange, $weekHigh, $weekLow, $marketCap, $region, $currency, $ticker);
+    $stmt->bind_param("sdsddddsss", 
+    $company, 
+    $price, 
+    $timestamp, 
+    $weekChange, 
+    $weekHigh, 
+    $weekLow, 
+    $marketCap, 
+    $region, 
+    $currency, 
+    $ticker
+);
     
     if (!$stmt->execute()) {
         error_log("Execution failed for ticker: $ticker. Error: " . $stmt->error);
