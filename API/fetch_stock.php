@@ -72,9 +72,26 @@ function processRequest($request) {
             error_log(message: "Fetching ticker for user: " . $ticker);
             return fetchStockData($ticker);
 
-        default:
-            return ["status" => "error", "message" => "Invalid request type"];
-    }
+            case "fetch_stock_batch":
+                if (!isset($request['data']['tickers']) || !is_array($request['data']['tickers'])) {
+                    return ["status" => "error", "message" => "Tickers array is required for batch request"];
+                }
+                $tickers = $request['data']['tickers'];
+                $batchData = [];
+                foreach ($tickers as $ticker) {
+                    $ticker = strtoupper(trim($ticker));
+                    $result = fetchStockData($ticker);
+                    if ($result['status'] === 'success') {
+                        $batchData[$ticker] = $result['data'];
+                    } else {
+                        $batchData[$ticker] = ["status" => "error", "message" => "Data not found for ticker: $ticker"];
+                    }
+                }
+                return ["status" => "success", "data" => $batchData];
+    
+            default:
+                return ["status" => "error", "message" => "Invalid request type"];
+        }
 }
 
 // Start the RabbitMQ server on the DMZ
