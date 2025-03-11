@@ -80,15 +80,17 @@ $portfolio = $response["portfolio"]; // array of holdings
                             </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ($portfolio as $row): ?>
-                            <?php
+                        <?php 
+                            $totalPortfolioValue = 0;
+                            foreach ($portfolio as $row): 
                                 $ticker        = htmlspecialchars($row["ticker"]);
                                 $quantity      = (int)$row["quantity"];
                                 $purchasePrice = (float)$row["purchase_price"];
                                 $currentPrice  = (float)$row["current_price"];
                                 $purchaseDate  = htmlspecialchars($row["purchase_date"]);
                                 $currentValue  = $quantity * $currentPrice;
-                            ?>
+                                $totalPortfolioValue += $currentValue;
+                        ?>
                             <tr>
                                 <td><?php echo $ticker; ?></td>
                                 <td><?php echo $quantity; ?></td>
@@ -100,6 +102,9 @@ $portfolio = $response["portfolio"]; // array of holdings
                         <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3 text-right">
+                    <h5>Total Portfolio Value: <strong>$<?php echo number_format($totalPortfolioValue, 2); ?></strong></h5>
                 </div>
             <?php else: ?>
                 <p class="text-center text-muted">You have no holdings at the moment.</p>
