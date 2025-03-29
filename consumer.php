@@ -4,7 +4,7 @@ require_once "testRabbitMQ_response.ini";
 
 function processRequest($request)
 {
-    $mydb = new mysqli("192.168.1.142", "testUser", "12345", "it490db");
+    $mydb = new mysqli("localhost", "testUser", "12345", "it490db");
     if ($mydb->connect_error) {
         return ["status" => "error", "message" => "Database connection failed: " . $mydb->connect_error];
     }
@@ -64,7 +64,7 @@ function processRequest($request)
             
                 // If stock is not found, request from DMZ server
                 error_log("Stock not found in DB, requesting from DMZ: " . $ticker);
-                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzClient = new rabbitMQClient("/home/rabbitdb/IT490-Project/RabbitDMZ.ini", "dmzServer");
                 $dmzRequest = ['type' => 'fetch_stock', 'data' => ['ticker' => $ticker]]; 
                 $dmzResponse = $dmzClient->send_request($dmzRequest);
             
@@ -323,7 +323,7 @@ function processRequest($request)
         
                 // Make sure you have the correct path for rabbitMQLib.inc if not already included
                 require_once "rabbitMQLib.inc";
-                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzClient = new rabbitMQClient("/home/rabbitdb/IT490-Project/RabbitDMZ.ini", "dmzServer");
                 // Must match how your DMZ expects requests
                 $dmzRequest = [
                     'type' => 'fetch_stock',
@@ -457,7 +457,7 @@ function processRequest($request)
                 error_log("Ticker '$ticker' not found locally. Requesting from DMZ...");
         
                 require_once "rabbitMQLib.inc";
-                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzClient = new rabbitMQClient("/home/rabbitdb/IT490-Project/RabbitDMZ.ini", "dmzServer");
                 $dmzRequest = [
                     'type' => 'fetch_stock',
                     'data' => ['ticker' => $ticker]
