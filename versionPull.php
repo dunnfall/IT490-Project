@@ -1,8 +1,10 @@
 <?php
 require_once('rabbitMQLib.inc');
 
-$localTarPath = "/home/website/IT490-Project/bundles"; 
-$extractionPath = "/home/website/IT490-Project"; 
+$home = getenv('HOME');
+
+$localTarPath = $home . "/IT490-Project/bundles"; 
+$extractionPath = $home . "/IT490-Project"; 
 
 $deploymentServerUser = "deployment";    
 $deploymentServerIP = "100.76.144.81"; 
