@@ -43,17 +43,13 @@ function getLatestPassedVersion() {
  *    then record an entry in deployment_history
  *    for environment logs or tracking.
  */
-function addVersionToDatabase($versionNumber, $bundlePath) {
+function addVersionToDatabase($versionNumber, $bundlePath, $bundleName) {
     global $dbHost, $dbName, $dbUser, $dbPassword;
 
     try {
         $db = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPassword);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Insert into bundles: we assume a default bundle_name or you can pass it as a param
-        $bundleName = "DEAA";
-
-        // 1) Insert the new bundle as status 'new'
         $stmt = $db->prepare("
             INSERT INTO bundles (bundle_name, version_number, status)
             VALUES (:bundle_name, :version_number, 'new')
@@ -62,13 +58,11 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
         $stmt->bindParam(':version_number', $versionNumber);
         $stmt->execute();
 
-        // Get the newly inserted bundle's ID
+        // The rest of the function stays the same...
         $bundleId = $db->lastInsertId();
 
-        // 2) Insert a record in deployment_history (optional environment = 'Development', logs = bundlePath)
-        //    If you prefer a different environment or no environment, adjust as needed.
         $environment = 'Development';
-        $historyStatus = 'success';  // or 'failure' if something goes wrong
+        $historyStatus = 'success';
         $logs = "Bundle path: " . $bundlePath;
 
         $histStmt = $db->prepare("
@@ -81,8 +75,6 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
         $histStmt->bindParam(':logs', $logs);
         $histStmt->execute();
 
-        // Optionally set the status in bundles to 'new' (already done in the insert).
-        // If you want a follow-up action, you can do it here.
         updateDeploymentStatus($versionNumber, "new");
 
         return ["success" => true, "message" => "Version $versionNumber added to bundles and deployment_history."];
@@ -90,6 +82,7 @@ function addVersionToDatabase($versionNumber, $bundlePath) {
         return ["success" => false, "message" => $e->getMessage()];
     }
 }
+
 
 /**
  * 3. Update the bundle's status in the bundles table
@@ -171,11 +164,15 @@ function getSpecificVersion($versionNumber) {
         $specific = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($specific) {
+            $bundleName = $specific['bundle_name'];
+            $bundlePath = "/home/deployment/IT490-Project/bundles/{$bundleName}-version-{$versionNumber}.tar.gz";
+
             return [
                 "success"        => true,
                 "version_number" => $specific['version_number'],
                 "bundle_name"    => $specific['bundle_name'],
-                "status"         => $specific['status']
+                "status"         => $specific['status'],
+                "bundle_path"    => $bundlePath
             ];
         } else {
             return ["success" => false, "message" => "Version $versionNumber not found in bundles."];
@@ -213,11 +210,16 @@ function handleRequest($request) {
             $versionNumber = $request['version_number'];
             return getSpecificVersion($versionNumber);
 
-        case "deploy":
-            // 'deploy' expects a version_number and bundle_path from the request
+            case "deploy":
+                $versionNumber = $request['version_number'];
+                $bundlePath    = $request['bundle_path'];
+                $bundleName    = $request['bundle_type'];  // capture the actual name from the request
+                return addVersionToDatabase($versionNumber, $bundlePath, $bundleName);
+            
+        
+        case "pullSpecificVersion":
             $versionNumber = $request['version_number'];
-            $bundlePath    = $request['bundle_path'];
-            return addVersionToDatabase($versionNumber, $bundlePath);
+            return getSpecificVersion($versionNumber);   
 
         default:
             return ["error" => "Unsupported request type"];
