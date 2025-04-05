@@ -22,7 +22,7 @@ case $bundleChoice in
         ;;
 esac
 
-versionTrackerFile="/home/website/IT490-Project/bundles/versionTracker.txt"
+versionTrackerFile=~/IT490-Project/bundles/versionTracker.txt
 latestVersionNum=$(tail -n 1 "$versionTrackerFile")
 
 newVersionNum=$(($latestVersionNum + 1))
@@ -36,7 +36,7 @@ if [ $# -eq 0 ]; then
 fi
 
 # Define the directory where bundles are stored on this machine
-bundlesDir="/home/website/IT490-Project/bundles"
+bundlesDir=~/IT490-Project/bundles
 bundleFileName="${bundlesDir}/${bundleName}-version-${newVersionNum}.tar.gz"
 
 # Create the tar.gz archive in the bundles directory (removing the leading ./ from file names)
@@ -46,6 +46,6 @@ tar --transform='s|./||' -czf "$bundleFileName" "$@"
 #scp "$bundleFileName" deployment@100.76.144.81:/home/deployment/IT490-Project/bundles
 
 # Trigger the deployment process
-php "/home/website/IT490-Project/triggerDeployment2.php"
+php ~/IT490-Project/triggerDeployment2.php
 
 echo "Bundling and deployment process completed for $bundleName (version $newVersionNum)."

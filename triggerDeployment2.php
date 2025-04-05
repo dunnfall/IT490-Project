@@ -1,7 +1,9 @@
 <?php
 require_once('rabbitMQLib.inc');
 
-$versionTrackerFile = "/home/website/IT490-Project/bundles/versionTracker.txt";
+$home = getenv('HOME');
+
+$versionTrackerFile = $home . "/IT490-Project/bundles/versionTracker.txt";
 
 $version_number = "";
 if (file_exists($versionTrackerFile)) {
@@ -15,7 +17,7 @@ if (empty($version_number)) {
     die("Error: Could not determine the latest version from versionTracker.txt.\n");
 }
 
-$bundlingDir = "/home/website/IT490-Project/bundles";
+$bundlingDir = $home . "/IT490-Project/bundles";
 $deploymentDir = "/home/deployment/IT490-Project/bundles";
 
 $bundleFiles = glob("$bundlingDir/*-version-$version_number.tar.gz");

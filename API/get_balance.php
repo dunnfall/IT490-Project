@@ -18,3 +18,4 @@ if ($response && isset($response['status']) && $response['status']==='success') 
     echo json_encode(["error"=>$response['message'] ?? "Failed"]);
 }
 ?>
+//this is just for testing purposes to see if the deployment is actually working.
