@@ -236,7 +236,7 @@ $username = $response['username'];
         <p id="errorMessage" class="text-danger mt-3"></p>
     </div>
     
-    <!-- Bootstrap JS Bundle -->
+    <!-- Bootstrap JS Bundle Im adding this comment to see if it the deployment works with the changed paths i did-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
