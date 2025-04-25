@@ -1,0 +1,63 @@
+nohup: ignoring input
+
+
+[testServer]
+BROKER_HOST = 192.168.1.69
+BROKER_PORT = 5672
+USER = admin
+PASSWORD = admin
+VHOST = testHost
+EXCHANGE = testExchange
+QUEUE = testQueue
+EXCHANGE_TYPE = direct
+AUTO_DELETE = true
+
+error: rabbitMQServer: process_message: exception caught: AMQPQueueException: Server channel error: 404, message: NOT_FOUND - no queue 'testQueue_response' in vhost 'testHost' in /home/rabbit/IT490-Project/rabbitMQLib.inc:77
+Stack trace:
+#0 /home/rabbit/IT490-Project/rabbitMQLib.inc(77): AMQPQueue->bind()
+#1 [internal function]: rabbitMQServer->process_message()
+#2 /home/rabbit/IT490-Project/rabbitMQLib.inc(122): AMQPQueue->consume()
+#3 /home/rabbit/IT490-Project/consumer.php(57): rabbitMQServer->process_requests()
+#4 {main}processed one-way message
+error: rabbitMQServer: process_message: exception caught: AMQPQueueException: Server channel error: 404, message: NOT_FOUND - no queue 'testQueue_response' in vhost 'testHost' in /home/rabbit/IT490-Project/rabbitMQLib.inc:77
+Stack trace:
+#0 /home/rabbit/IT490-Project/rabbitMQLib.inc(77): AMQPQueue->bind()
+#1 [internal function]: rabbitMQServer->process_message()
+#2 /home/rabbit/IT490-Project/rabbitMQLib.inc(122): AMQPQueue->consume()
+#3 /home/rabbit/IT490-Project/consumer.php(57): rabbitMQServer->process_requests()
+#4 {main}processed one-way message
+error: rabbitMQServer: process_message: exception caught: AMQPQueueException: Server channel error: 404, message: NOT_FOUND - no queue 'testQueue_response' in vhost 'testHost' in /home/rabbit/IT490-Project/rabbitMQLib.inc:77
+Stack trace:
+#0 /home/rabbit/IT490-Project/rabbitMQLib.inc(77): AMQPQueue->bind()
+#1 [internal function]: rabbitMQServer->process_message()
+#2 /home/rabbit/IT490-Project/rabbitMQLib.inc(122): AMQPQueue->consume()
+#3 /home/rabbit/IT490-Project/consumer.php(57): rabbitMQServer->process_requests()
+#4 {main}processed one-way message
+error: rabbitMQServer: process_message: exception caught: AMQPQueueException: Server channel error: 404, message: NOT_FOUND - no queue 'testQueue_response' in vhost 'testHost' in /home/rabbit/IT490-Project/rabbitMQLib.inc:77
+Stack trace:
+#0 /home/rabbit/IT490-Project/rabbitMQLib.inc(77): AMQPQueue->bind()
+#1 [internal function]: rabbitMQServer->process_message()
+#2 /home/rabbit/IT490-Project/rabbitMQLib.inc(122): AMQPQueue->consume()
+#3 /home/rabbit/IT490-Project/consumer.php(57): rabbitMQServer->process_requests()
+#4 {main}processed one-way message
+error: rabbitMQServer: process_message: exception caught: AMQPQueueException: Server channel error: 404, message: NOT_FOUND - no queue 'testQueue_response' in vhost 'testHost' in /home/rabbit/IT490-Project/rabbitMQLib.inc:77
+Stack trace:
+#0 /home/rabbit/IT490-Project/rabbitMQLib.inc(77): AMQPQueue->bind()
+#1 [internal function]: rabbitMQServer->process_message()
+#2 /home/rabbit/IT490-Project/rabbitMQLib.inc(122): AMQPQueue->consume()
+#3 /home/rabbit/IT490-Project/consumer.php(57): rabbitMQServer->process_requests()
+#4 {main}processed one-way message
+error: rabbitMQServer: process_message: exception caught: AMQPQueueException: Server channel error: 404, message: NOT_FOUND - no queue 'testQueue_response' in vhost 'testHost' in /home/rabbit/IT490-Project/rabbitMQLib.inc:77
+Stack trace:
+#0 /home/rabbit/IT490-Project/rabbitMQLib.inc(77): AMQPQueue->bind()
+#1 [internal function]: rabbitMQServer->process_message()
+#2 /home/rabbit/IT490-Project/rabbitMQLib.inc(122): AMQPQueue->consume()
+#3 /home/rabbit/IT490-Project/consumer.php(57): rabbitMQServer->process_requests()
+#4 {main}processed one-way message
+error: rabbitMQServer: process_message: exception caught: AMQPQueueException: Server channel error: 404, message: NOT_FOUND - no queue 'testQueue_response' in vhost 'testHost' in /home/rabbit/IT490-Project/rabbitMQLib.inc:77
+Stack trace:
+#0 /home/rabbit/IT490-Project/rabbitMQLib.inc(77): AMQPQueue->bind()
+#1 [internal function]: rabbitMQServer->process_message()
+#2 /home/rabbit/IT490-Project/rabbitMQLib.inc(122): AMQPQueue->consume()
+#3 /home/rabbit/IT490-Project/consumer.php(57): rabbitMQServer->process_requests()
+#4 {main}processed one-way message
