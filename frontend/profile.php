@@ -1,4 +1,5 @@
 <?php
+if (!ob_get_level()) ob_start();
 // profile.php
 
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
@@ -27,9 +28,58 @@ if (!isset($response["status"]) || $response["status"] !== "success") {
 }
 
 // 2) Extract username, balance, portfolio
+// 2) Extract username, balance, portfolio
 $username  = $response["username"];
 $balance   = (float)$response["balance"];
 $portfolio = $response["portfolio"]; // array of holdings
+
+
+// Tell FPDF where to find font definitions
+define('FPDF_FONTPATH', __DIR__ . '/../partials/fpdf181/font');
+require_once __DIR__ . "/../partials/fpdf181/fpdf.php";
+
+// PDF export via FPDF
+if (isset($_GET['export']) && $_GET['export'] === 'pdf') {
+    if (ob_get_level()) ob_clean();
+    // Initialize PDF
+    $pdf = new FPDF();
+    $pdf->AddPage();
+    // Title
+    $pdf->SetFont('Arial','B',16);
+    $pdf->Cell(0,10,'Your Portfolio',0,1,'C');
+    $pdf->Ln(5);
+    // Column headers
+    $pdf->SetFont('Arial','B',12);
+    $widths = [25, 20, 30, 30, 50, 30];
+    $headers = ['Ticker','Quantity','Buy Price','Curr Price','Date','Value'];
+    foreach ($headers as $i => $col) {
+        $pdf->Cell($widths[$i],7,$col,1,0,'C');
+    }
+    $pdf->Ln();
+    // Data rows
+    $pdf->SetFont('Arial','',12);
+    $total = 0;
+    foreach ($portfolio as $row) {
+        $value = $row['quantity'] * $row['current_price'];
+        $total += $value;
+        $pdf->Cell($widths[0],6,$row['ticker'],1,0,'L');
+        $pdf->Cell($widths[1],6,$row['quantity'],1,0,'C');
+        $pdf->Cell($widths[2],6,number_format($row['purchase_price'],2),1,0,'R');
+        $pdf->Cell($widths[3],6,number_format($row['current_price'],2),1,0,'R');
+        $pdf->Cell($widths[4],6,$row['purchase_date'],1,0,'L');
+        $pdf->Cell($widths[5],6,number_format($value,2),1,0,'R');
+        $pdf->Ln();
+    }
+    // Total row
+    $pdf->SetFont('Arial','B',12);
+    // Empty cells before total label
+    $pdf->Cell(array_sum(array_slice($widths, 0, 5)),7,'Total',1,0,'R');
+    $pdf->Cell($widths[5],7,number_format($total,2),1,0,'R');
+    // Output: use username in filename
+    $filename = $username . 's_portfolio.pdf';
+    $pdf->Output('D', $filename);
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,6 +114,11 @@ $portfolio = $response["portfolio"]; // array of holdings
         <?php endif; ?>
 
         <!-- Portfolio Section -->
+        <div class="text-right mb-2">
+            <a href="?export=pdf" class="btn btn-secondary">
+                <i class="fas fa-file-pdf"></i> Export PDF
+            </a>
+        </div>
         <div class="card shadow mt-4 p-4">
             <h2 class="text-center">Your Portfolio</h2>
             <?php if (!empty($portfolio)): ?>

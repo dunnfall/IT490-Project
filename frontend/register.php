@@ -15,7 +15,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         'data' => [
             'username' => $username,
             'email' => $email,
-            'password' => $password
+            'password' => $password,
+            'phone'   => $_POST['phone'],
+            'carrier' => $_POST['carrier'],
         ]
     ];
 

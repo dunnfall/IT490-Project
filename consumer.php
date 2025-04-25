@@ -233,6 +233,47 @@ function processRequest($request)
                 "email" => $rowEmail['email']
             ];
 
+        case "verifyAndGetPhone":
+            $token = $request['token'] ?? '';
+            if (!$token) {
+                return ["status" => "error", "message" => "No token provided"];
+            }
+
+            // Look‑up username from the token
+            $sqlToken = "SELECT username FROM tokens WHERE token = ? LIMIT 1";
+            $stmt = $mydb->prepare($sqlToken);
+            $stmt->bind_param("s", $token);
+            $stmt->execute();
+            $resToken = $stmt->get_result();
+
+            if ($resToken->num_rows < 1) {
+                return ["status" => "error", "message" => "Invalid token"];
+            }
+
+            $username = $resToken->fetch_assoc()['username'];
+
+            // Fetch phone number and carrier from users
+            $sqlPhone = "SELECT phone, carrier FROM users WHERE username = ? LIMIT 1";
+            $stmt2 = $mydb->prepare($sqlPhone);
+            $stmt2->bind_param("s", $username);
+            $stmt2->execute();
+            $resPhone = $stmt2->get_result();
+
+            // Check if phone exists and is not empty
+            $phoneRow = $resPhone->fetch_assoc();
+            $carrier = $phoneRow['carrier'] ?? '';
+            if ($resPhone->num_rows < 1 || !$phoneRow || !$phoneRow['phone']) {
+                return ["status" => "error", "message" => "Phone number not found"];
+            }
+
+            $phone = $phoneRow['phone'];
+
+            return [
+                "status"  => "success",
+                "phone"   => $phone,
+                "carrier" => $carrier
+            ];
+
         case "verifyAndGetBalance":
             // 1) Check if a token was provided
             $token = $request['token'] ?? '';
