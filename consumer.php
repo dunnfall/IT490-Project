@@ -4,7 +4,7 @@ require_once "testRabbitMQ_response.ini";
 
 function processRequest($request)
 {
-    $mydb = new mysqli("192.168.1.142", "testUser", "12345", "it490db");
+    $mydb = new mysqli("localhost", "testUser", "12345", "it490db");
     if ($mydb->connect_error) {
         return ["status" => "error", "message" => "Database connection failed: " . $mydb->connect_error];
     }
@@ -64,7 +64,7 @@ function processRequest($request)
             
                 // If stock is not found, request from DMZ server
                 error_log("Stock not found in DB, requesting from DMZ: " . $ticker);
-                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzClient = new rabbitMQClient("/home/rabbitdb/IT490-Project/RabbitDMZ.ini", "dmzServer");
                 $dmzRequest = ['type' => 'fetch_stock', 'data' => ['ticker' => $ticker]]; 
                 $dmzResponse = $dmzClient->send_request($dmzRequest);
             
@@ -233,6 +233,47 @@ function processRequest($request)
                 "email" => $rowEmail['email']
             ];
 
+        case "verifyAndGetPhone":
+            $token = $request['token'] ?? '';
+            if (!$token) {
+                return ["status" => "error", "message" => "No token provided"];
+            }
+
+            // Look‑up username from the token
+            $sqlToken = "SELECT username FROM tokens WHERE token = ? LIMIT 1";
+            $stmt = $mydb->prepare($sqlToken);
+            $stmt->bind_param("s", $token);
+            $stmt->execute();
+            $resToken = $stmt->get_result();
+
+            if ($resToken->num_rows < 1) {
+                return ["status" => "error", "message" => "Invalid token"];
+            }
+
+            $username = $resToken->fetch_assoc()['username'];
+
+            // Fetch phone number and carrier from users
+            $sqlPhone = "SELECT phone, carrier FROM users WHERE username = ? LIMIT 1";
+            $stmt2 = $mydb->prepare($sqlPhone);
+            $stmt2->bind_param("s", $username);
+            $stmt2->execute();
+            $resPhone = $stmt2->get_result();
+
+            // Check if phone exists and is not empty
+            $phoneRow = $resPhone->fetch_assoc();
+            $carrier = $phoneRow['carrier'] ?? '';
+            if ($resPhone->num_rows < 1 || !$phoneRow || !$phoneRow['phone']) {
+                return ["status" => "error", "message" => "Phone number not found"];
+            }
+
+            $phone = $phoneRow['phone'];
+
+            return [
+                "status"  => "success",
+                "phone"   => $phone,
+                "carrier" => $carrier
+            ];
+
         case "verifyAndGetBalance":
             // 1) Check if a token was provided
             $token = $request['token'] ?? '';
@@ -323,7 +364,7 @@ function processRequest($request)
         
                 // Make sure you have the correct path for rabbitMQLib.inc if not already included
                 require_once "rabbitMQLib.inc";
-                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzClient = new rabbitMQClient("/home/rabbitdb/IT490-Project/RabbitDMZ.ini", "dmzServer");
                 // Must match how your DMZ expects requests
                 $dmzRequest = [
                     'type' => 'fetch_stock',
@@ -457,7 +498,7 @@ function processRequest($request)
                 error_log("Ticker '$ticker' not found locally. Requesting from DMZ...");
         
                 require_once "rabbitMQLib.inc";
-                $dmzClient = new rabbitMQClient("/home/database/IT490-Project/RabbitDMZ.ini", "dmzServer");
+                $dmzClient = new rabbitMQClient("/home/rabbitdb/IT490-Project/RabbitDMZ.ini", "dmzServer");
                 $dmzRequest = [
                     'type' => 'fetch_stock',
                     'data' => ['ticker' => $ticker]
