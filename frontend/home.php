@@ -74,10 +74,18 @@ $username = $response['username'];
                 errorMessage.textContent = "";
                 stockTable.style.display = "table";
                 row.innerHTML = `<td>${data.ticker}</td>
-                                 <td>${data.company}</td>
-                                 <td>$${parseFloat(data.price).toFixed(2)}</td>
-                                 <td>${data.timestamp}</td>
-                                 <td><button class="btn btn-sm btn-info" onclick="showMoreInfo('${data.ticker}')">More Info</button></td>`;
+                 <td>${data.company}</td>
+                 <td>$${parseFloat(data.price).toFixed(2)}</td>
+                 <td>${data.timestamp}</td>
+                 <td>
+                   <button class="btn btn-sm btn-info" onclick="showMoreInfo('${data.ticker}')">
+                     More Info
+                   </button>
+                   <button class="btn btn-sm btn-success ml-2"
+                           onclick="addToWatchlist('${data.ticker}')">
+                     + Watchlist
+                   </button>
+                 </td>`;
 
                 recommendationContainer.style.display = "block";
                 document.getElementById("getRecommendationButton").setAttribute("data-ticker", ticker);
@@ -187,6 +195,26 @@ $username = $response['username'];
                 }
             });
         }
+
+            async function addToWatchlist(ticker) {
+                try {
+                    const res = await fetch("../backend/addToWatchlist.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ ticker })
+                    });
+                    const json = await res.json();
+                    if (json.success) {
+                    alert(`${ticker} added to your watchlist!`);
+                    } else {
+                    alert(`Error: ${json.error || json.message}`);
+                    }
+                    } catch (err) {
+                        console.error(err);
+                        alert("Could not add to watchlist.");
+                    }
+                }
+        
     </script>
 </head>
 <body>

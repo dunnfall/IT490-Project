@@ -455,7 +455,6 @@ function processRequest($request)
         
             break;
         
-        
         case "sell_stock":
             // 1) Validate input
             if (!isset($request['data']['username'], $request['data']['ticker'], $request['data']['quantity'])) {
@@ -683,11 +682,92 @@ function processRequest($request)
         // Optionally add a "logout" case to remove token if needed
         // case "logout":
         //    ...
+            break;
 
-        default:
-            return ["status" => "error", "message" => "Unknown action: " . $request['action']];
-    }
-}
+            case "add_to_watchlist":
+                // 1) validate token & ticker
+                $token  = $request['token'] ?? '';
+                $ticker = strtoupper(trim($request['data']['ticker'] ?? ''));
+                if (!$token || !$ticker) {
+                    return ["status"=>"error","message"=>"Token & ticker required"];
+                }
+                // 2) lookup user
+                $stmt = $mydb->prepare("SELECT username FROM tokens WHERE token=? LIMIT 1");
+                $stmt->bind_param("s",$token);
+                $stmt->execute();
+                $res = $stmt->get_result();
+                if (!$res->num_rows) {
+                    return ["status"=>"error","message"=>"Invalid token"];
+                }
+                $user = $res->fetch_assoc()['username'];
+                // 3) insert watchlist entry (ignore duplicates)
+                $ins = $mydb->prepare("
+                  INSERT IGNORE INTO watchlist (username, stock_symbol)
+                  VALUES (?, ?)
+                ");
+                $ins->bind_param("ss",$user,$ticker);
+                if (!$ins->execute()) {
+                    return ["status"=>"error","message"=>$mydb->error];
+                }
+                return ["status"=>"success","message"=>"$ticker added"];
+        
+            case "get_watchlist":
+                $token = $request['token'] ?? '';
+                if (!$token) {
+                    return ["status"=>"error","message"=>"No token provided"];
+                }
+                $stmt = $mydb->prepare("SELECT username FROM tokens WHERE token=? LIMIT 1");
+                $stmt->bind_param("s",$token);
+                $stmt->execute();
+                $res = $stmt->get_result();
+                if (!$res->num_rows) {
+                    return ["status"=>"error","message"=>"Invalid token"];
+                }
+                $user = $res->fetch_assoc()['username'];
+                $q = $mydb->prepare("
+                  SELECT id, stock_symbol
+                    FROM watchlist
+                   WHERE username=?
+                ORDER BY id DESC
+                ");
+                $q->bind_param("s",$user);
+                $q->execute();
+                $r = $q->get_result();
+                $out = [];
+                while ($row = $r->fetch_assoc()) {
+                    $out[] = $row;
+                }
+                return ["status"=>"success","data"=>$out];
+        
+            case "remove_from_watchlist":
+                $token = $request['token'] ?? '';
+                $id    = intval($request['data']['id'] ?? 0);
+                if (!$token || !$id) {
+                    return ["status"=>"error","message"=>"Token & watchlist ID required"];
+                }
+                $stmt = $mydb->prepare("SELECT username FROM tokens WHERE token=? LIMIT 1");
+                $stmt->bind_param("s",$token);
+                $stmt->execute();
+                $res = $stmt->get_result();
+                if (!$res->num_rows) {
+                    return ["status"=>"error","message"=>"Invalid token"];
+                }
+                $user = $res->fetch_assoc()['username'];
+                $del = $mydb->prepare("
+                  DELETE FROM watchlist
+                   WHERE id=? AND username=?
+                ");
+                $del->bind_param("is",$id,$user);
+                if (!$del->execute()) {
+                    return ["status"=>"error","message"=>$mydb->error];
+                }
+                return ["status"=>"success","message"=>"Removed"];
+        
+            default:
+                return ["status"=>"error","message"=>"Unknown action: {$request['action']}"];
+        }
+    }   
+
 
 // Start the RabbitMQ server
 $server = new rabbitMQServer("testRabbitMQ_response.ini", "responseServer");

@@ -33,6 +33,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="../frontend/sell.php">Sell</a>
                 </li>
+
+                <!-- Watchlist -->
+                <li class="nav-item">
+                    <a class="nav-link" href="../frontend/watchlist.php">Watchlist</a>
+                </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
