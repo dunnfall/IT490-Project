@@ -23,17 +23,5 @@ function getHostInfo(array $extra = NULL)
     }
     return $machine;
 }
-
-$machine['loggingMachine'] = array(
-    "BROKER_HOST" => "192.168.1.201",
-    "BROKER_PORT" => 5672,
-    "USER" => "admin",
-    "PASSWORD" => "admin",
-    "VHOST" => "testHost",
-    "EXCHANGE" => "central_logs",
-    "EXCHANGE_TYPE" => "fanout",
-    "QUEUE" => "prodRabbitDBQueue"
-);
-
 ?>
 

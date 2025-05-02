@@ -10,6 +10,6 @@ function log_to_file($msg) {
     file_put_contents("/var/log/cluster_errors.log", $log, FILE_APPEND);
 }
 
-$server = new rabbitMQServer("loggingMachine");
+$server = new rabbitMQServer("host.ini","loggingMachine");
 $server->process_requests("log_to_file");
 ?>
