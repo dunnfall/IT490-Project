@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $balance  = (float)$verifyResp["balance"];
     } else {
         // Invalid token => redirect
-        header("Location: login.html");
+        header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/login.html");
         exit();
     }
 }
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'quantity'  => $quantity,
             'newBal'    => $balance
         ]);
-        header("Location: ../API/send_notification.php?$qs");
+        header("Location: https://" . $_SERVER['HTTP_HOST'] . "/API/send_notification.php?$qs");
         exit();
     } else {
         $message = "Buy error: " . ($buyResp["message"] ?? "Unknown");

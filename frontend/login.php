@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once "/home/website/IT490-Project/rabbitMQLib.inc";
 require_once "/home/website/IT490-Project/testRabbitMQ.ini";
 require_once "/home/website/IT490-Project/error_logger.php";
@@ -19,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($response['status'] === 'success') {
             $token = $response['token'];
             setcookie("authToken", $token, time() + 3600, "/");
-            header("Location: home.php");
+            header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/home.php");;
             exit();
         } else {
             log_error("Login failed for user: $identifier");

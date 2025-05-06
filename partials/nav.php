@@ -18,30 +18,30 @@
             <ul class="navbar-nav">
                 <!-- Home link -->
                 <li class="nav-item">
-                    <a class="nav-link" href="../frontend/home.php">Home</a>
+                    <a class="nav-link" href="https://prodwebsite.tail5c772.ts.net/frontend/home.php">Home</a>
                 </li>
 
                 <!-- Profile link -->
                 <li class="nav-item">
-                    <a class="nav-link" href="../frontend/profile.php">Profile</a>
+                    <a class="nav-link" href="https://prodwebsite.tail5c772.ts.net/frontend/profile.php">Profile</a>
                 </li>
 
                 <!-- New links for Buy and Sell -->
                 <li class="nav-item">
-                    <a class="nav-link" href="../frontend/buy.php">Buy</a>
+                    <a class="nav-link" href="https://prodwebsite.tail5c772.ts.net/frontend/buy.php">Buy</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../frontend/sell.php">Sell</a>
+                    <a class="nav-link" href="https://prodwebsite.tail5c772.ts.net/frontend/sell.php">Sell</a>
                 </li>
 
                 <!-- Watchlist -->
                 <li class="nav-item">
-                    <a class="nav-link" href="../frontend/watchlist.php">Watchlist</a>
+                    <a class="nav-link" href="https://prodwebsite.tail5c772.ts.net/frontend/watchlist.php">Watchlist</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="btn btn-danger" href="../frontend/logout.php">Logout</a>
+                    <a class="btn btn-danger" href="https://prodwebsite.tail5c772.ts.net/frontend/logout.php">Logout</a>
                 </li>
             </ul>
         </div>

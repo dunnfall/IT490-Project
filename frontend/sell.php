@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $username = $verifyResp["username"];
         $balance  = (float)$verifyResp["balance"];
     } else {
-        header("Location: login.html");
+        header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/login.html");
         exit();
     }
 }
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'quantity'  => $quantity,
             'newBal'    => $balance
         ]);
-        header("Location: ../API/send_notification.php?$qs");
+        header("Location: https://" . $_SERVER['HTTP_HOST'] . "/API/send_notification.php?$qs");
         exit();
     } else {
         $message = "Sell error: " . ($sellResp["message"] ?? "Unknown");

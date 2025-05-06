@@ -11,7 +11,7 @@ use PHPMailer\PHPMailer\Exception;
 // --- Auth token check ---
 $token = $_COOKIE['authToken'] ?? '';
 if (!$token) {
-    header("Location: ../frontend/login.html");
+    header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/login.html");;
     exit();
 }
 
@@ -40,7 +40,7 @@ $userCarrier = ($phResp['status'] ?? '') === 'success' ? $phResp['carrier'] : nu
 
 // 3) If invalid token, redirect with an error
 if (!isset($response["status"]) || $response["status"] !== "success") {
-    header("Location: ../frontend/profile.php?error=" . urlencode($response["message"] ?? "Invalid token"));
+    header("Location: https://" . $_SERVER['HTTP_HOST'] . urlencode($response["message"] ?? "Invalid token"));
     exit();
 }
 $userEmail = $response["email"];
@@ -115,10 +115,10 @@ try {
     $mail->send();
 
     // 6) Redirect with success
-    header("Location: ../frontend/profile.php?success=1");
+    header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/profile.php?success=1");
     exit();
 } catch (Exception $e) {
-    header("Location: ../frontend/profile.php?error=" . urlencode($mail->ErrorInfo));
+    header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/profile.php" . urlencode($mail->ErrorInfo));
     exit();
 }
 ?>
