@@ -15,6 +15,7 @@ class rabbitMQServer
 	private $routing_key = '*';
 	private $exchange_type = "topic";
 	private $auto_delete = false;
+	private $durable = false;
 
 	function __construct($machine, $server = "rabbitMQ")
 	{
@@ -32,6 +33,11 @@ class rabbitMQServer
 		{
 			$this->auto_delete = $this->machine[$server]["AUTO_DELETE"];
 		}
+		if (isset($this->machine[$server]["DURABLE"])) {
+			$this->durable = $this->machine[$server]["DURABLE"];
+		}
+		$this->auto_delete = filter_var($this->auto_delete, FILTER_VALIDATE_BOOLEAN);
+		$this->durable     = filter_var($this->durable,     FILTER_VALIDATE_BOOLEAN);
 		$this->exchange = $this->machine[$server]["EXCHANGE"];
 		$this->queue = $this->machine[$server]["QUEUE"];
 	}
@@ -117,6 +123,11 @@ class rabbitMQServer
 
 			$this->conn_queue = new AMQPQueue($channel);
 			$this->conn_queue->setName($this->queue);
+			$flags = 0;
+			if ($this->durable)     $flags |= AMQP_DURABLE;
+			if ($this->auto_delete) $flags |= AMQP_AUTODELETE;
+			$this->conn_queue->setFlags($flags);
+			$this->conn_queue->declare();
 			$this->conn_queue->bind($exchange->getName(),$this->routing_key);
 
 			$this->conn_queue->consume(array($this,'process_message'));
@@ -147,6 +158,8 @@ class rabbitMQClient
 	private $routing_key = '*';
 	private $response_queue = array();
 	private $exchange_type = "topic";
+	private $durable = false;
+	private $auto_delete = false;
 
 	function __construct($machine, $server = "rabbitMQ")
 	{
@@ -164,6 +177,11 @@ class rabbitMQClient
 		{
 			$this->auto_delete = $this->machine[$server]["AUTO_DELETE"];
 		}
+		if (isset($this->machine[$server]["DURABLE"])) {
+			$this->durable = $this->machine[$server]["DURABLE"];
+		}
+		$this->auto_delete = filter_var($this->auto_delete, FILTER_VALIDATE_BOOLEAN);
+		$this->durable     = filter_var($this->durable,     FILTER_VALIDATE_BOOLEAN);
 		$this->exchange = $this->machine[$server]["EXCHANGE"];
 		$this->queue = $this->machine[$server]["QUEUE"];
 	}
@@ -289,6 +307,11 @@ class rabbitMQClient
 			$exchange->setType($this->exchange_type);
 			$this->conn_queue = new AMQPQueue($channel);
 			$this->conn_queue->setName($this->queue);
+			$flags = 0;
+			if ($this->durable)     $flags |= AMQP_DURABLE;
+			if ($this->auto_delete) $flags |= AMQP_AUTODELETE;
+			$this->conn_queue->setFlags($flags);
+			$this->conn_queue->declare();
 			$this->conn_queue->bind($exchange->getName(),$this->routing_key);
 			return $exchange->publish($json_message,$this->routing_key);
 		}
@@ -299,4 +322,3 @@ class rabbitMQClient
 	}
 }
 ?>
-
