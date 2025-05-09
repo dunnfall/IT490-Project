@@ -2,6 +2,20 @@
 require_once "rabbitMQLib.inc";
 require_once "testRabbitMQ_response.ini";
 
+function send2FACode($username, $code, $db) {
+    // Get email
+    $stmt = $db->prepare("SELECT email FROM users WHERE username = ? LIMIT 1");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows > 0) {
+        $email = $res->fetch_assoc()['email'];
+        // Use PHP mail or a library like PHPMailer
+        mail($email, "Your 2FA Code", "Your verification code is: $code");
+    }
+}
+
+
 function processRequest($request)
 {
     $mydb = new mysqli("localhost", "testUser", "12345", "it490db");
@@ -157,27 +171,29 @@ function processRequest($request)
             if ($result->num_rows > 0) {
                 $user = $result->fetch_assoc();
                 if (password_verify($password, $user['password'])) {
-                    // Generate a token and store it
-                    $token = bin2hex(random_bytes(16)); // 32-char hex
-
-                    $insertToken = "INSERT INTO tokens (token, username) VALUES (?, ?)";
-                    $stmtToken = $mydb->prepare($insertToken);
-                    $stmtToken->bind_param("ss", $token, $user['username']);
-                    $stmtToken->execute();
-
+                    
+                    $code = str_pad(rand(0, 999999), 6, "0", STR_PAD_LEFT);
+                
+                    $stmtCode = $mydb->prepare("INSERT INTO two_fa_codes (username, code) VALUES (?, ?)");
+                    $stmtCode->bind_param("ss", $user['username'], $code);
+                    $stmtCode->execute();
+                
+                    $email = $user['email'];
+                    $subject = "Your 2FA Verification Code";
+                    $message = "Your verification code is: $code";
+                    $headers = "From: no-reply@DEAA.com";
+                
+                    mail($email, $subject, $message, $headers);
+                
                     return [
-                        "status" => "success",
-                        "message" => "User authenticated.",
-                        "username" => $user['username'],
-                        "token" => $token
+                        "status" => "2fa_required",
+                        "message" => "Verification code sent to your email.",
+                        "username" => $user['username']
                     ];
+                }
                 } else {
                     return ["status" => "error", "message" => "Invalid password."];
                 }
-            } else {
-                return ["status" => "error", "message" => "User not found."];
-            }
-
         case "verifyToken":
             if (!isset($request['token'])) {
                 return ["status" => "error", "message" => "No token provided"];
@@ -762,7 +778,31 @@ function processRequest($request)
                     return ["status"=>"error","message"=>$mydb->error];
                 }
                 return ["status"=>"success","message"=>"Removed"];
-        
+                
+                case "verify2fa":
+                    $username = $request['username'];
+                    $code = $request['code'];
+                
+                    $stmt = $mydb->prepare("SELECT * FROM two_fa_codes WHERE username=? AND code=? AND created_at >= NOW() - INTERVAL 5 MINUTE ORDER BY created_at DESC LIMIT 1");
+                    $stmt->bind_param("ss", $username, $code);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                
+                    if ($result->num_rows > 0) {
+                        $token = bin2hex(random_bytes(16));
+                        $stmt = $mydb->prepare("INSERT INTO tokens (token, username) VALUES (?, ?)");
+                        $stmt->bind_param("ss", $token, $username);
+                        $stmt->execute();
+                
+                        return [
+                            "status" => "success",
+                            "token" => $token,
+                            "message" => "2FA verified"
+                        ];
+                    } else {
+                        return ["status" => "error", "message" => "Invalid or expired code"];
+                    }
+                
             default:
                 return ["status"=>"error","message"=>"Unknown action: {$request['action']}"];
         }
