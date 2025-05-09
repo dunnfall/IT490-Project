@@ -1,20 +1,51 @@
 <?php
 require_once "rabbitMQLib.inc";
 require_once "testRabbitMQ_response.ini";
+require __DIR__ . '/../vendor/autoload.php';
 
-function send2FACode($username, $code, $db) {
-    // Get email
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
+function send2FACode($username, $code, $db)
+{
+    // Lookup email from DB
     $stmt = $db->prepare("SELECT email FROM users WHERE username = ? LIMIT 1");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $res = $stmt->get_result();
-    if ($res->num_rows > 0) {
-        $email = $res->fetch_assoc()['email'];
-        // Use PHP mail or a library like PHPMailer
-        mail($email, "Your 2FA Code", "Your verification code is: $code");
+
+    if ($res->num_rows < 1) {
+        error_log("send2FACode: user not found");
+        return false;
+    }
+
+    $email = $res->fetch_assoc()['email'];
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'alucky0140@gmail.com';
+        $mail->Password   = 'fvts edcz wnmy izgi'; // App password
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
+
+        $mail->setFrom('alucky0140@gmail.com', 'My App - 2FA');
+        $mail->addAddress($email);
+        $mail->isHTML(true);
+        $mail->Subject = 'Your 2FA Verification Code';
+        $mail->Body    = "Your 2FA code is: <strong>$code</strong><br>This code will expire in 5 minutes.";
+        $mail->AltBody = "Your 2FA code is: $code";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer error: " . $mail->ErrorInfo);
+        return false;
     }
 }
-
 
 function processRequest($request)
 {
@@ -178,12 +209,7 @@ function processRequest($request)
                     $stmtCode->bind_param("ss", $user['username'], $code);
                     $stmtCode->execute();
                 
-                    $email = $user['email'];
-                    $subject = "Your 2FA Verification Code";
-                    $message = "Your verification code is: $code";
-                    $headers = "From: no-reply@DEAA.com";
-                
-                    mail($email, $subject, $message, $headers);
+                    send2FACode($user['username'], $code, $mydb);
                 
                     return [
                         "status" => "2fa_required",
@@ -778,7 +804,7 @@ function processRequest($request)
                     return ["status"=>"error","message"=>$mydb->error];
                 }
                 return ["status"=>"success","message"=>"Removed"];
-                
+
                 case "verify2fa":
                     $username = $request['username'];
                     $code = $request['code'];
