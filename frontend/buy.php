@@ -1,7 +1,7 @@
 <?php
 // buy.php
 
-// 1) Check if the user has a valid auth token
+// 1) THis is a test for deployment ignore this
 $token = $_COOKIE['authToken'] ?? '';
 if (!$token) {
     header("Location: login.html");
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $balance  = (float)$verifyResp["balance"];
     } else {
         // Invalid token => redirect
-        header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/login.html");
+        header("Location: login.html");
         exit();
     }
 }
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'quantity'  => $quantity,
             'newBal'    => $balance
         ]);
-        header("Location: https://" . $_SERVER['HTTP_HOST'] . "/API/send_notification.php?$qs");
+        header("Location: ../API/send_notification.php?$qs");
         exit();
     } else {
         $message = "Buy error: " . ($buyResp["message"] ?? "Unknown");
