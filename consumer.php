@@ -1,7 +1,7 @@
 <?php
 require_once "rabbitMQLib.inc";
 require_once "testRabbitMQ_response.ini";
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
