@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($response['status'] === "success") {
         setcookie("authToken", $response['token'], time() + 3600, "/");
-        header("Location: home.php");
+        header("Location: /frontend/home.php");
     } else {
         header("Location: 2fa.html?message=invalid_code");
     }

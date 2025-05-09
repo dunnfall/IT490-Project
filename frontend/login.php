@@ -17,11 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($response['status'] === 'success') {
         $token = $response['token'];
         setcookie("authToken", $token, time() + 3600, "/");
-        header("Location: home.php");
+        header("Location: /frontend/home.php");
         exit();
     } elseif ($response['status'] === '2fa_required') {
         $username = urlencode($response['username']);
-        header("Location: 2fa.html?username={$username}");
+        header("Location: 2fa.php?username={$username}");
         exit();
     } else {
         // Login failure
