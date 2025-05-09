@@ -222,7 +222,7 @@ $username = $response['username'];
         <div class="mb-4">
             <h2 class="mb-3">Search for Stock Information</h2>
             <div class="input-group">
-                <input type="text" class="form-control" id="ticker" placeholder="Insert home dawg">
+                <input type="text" class="form-control" id="ticker" placeholder="Insert ticker">
                 <button class="btn btn-primary" onclick="searchStock()">Search</button>
             </div>
         </div>

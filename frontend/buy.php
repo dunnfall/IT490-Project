@@ -1,7 +1,7 @@
 <?php
 // buy.php
 
-// 1) Check if the user has a valid auth token
+// 1) THis is a test for deployment ignore this
 $token = $_COOKIE['authToken'] ?? '';
 if (!$token) {
     header("Location: login.html");
