@@ -24,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setcookie("authToken", $token, time() + 3600, "/");
             header("Location: https://" . $_SERVER['HTTP_HOST'] . "/frontend/home.php");;
             exit();
+        } elseif ($response['status'] === '2fa_required') {
+            $username = urlencode($response['username']);
+            header("Location: 2fa.php?username={$username}");
+            exit();
         } else {
             log_error("Login failed for user: $identifier");
             header("Location: login.html?message=login_failed");
