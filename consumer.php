@@ -1,6 +1,51 @@
 <?php
 require_once "rabbitMQLib.inc";
 require_once "testRabbitMQ_response.ini";
+require __DIR__ . '/vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
+function send2FACode($username, $code, $db)
+{
+    // Lookup email from DB
+    $stmt = $db->prepare("SELECT email FROM users WHERE username = ? LIMIT 1");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    if ($res->num_rows < 1) {
+        error_log("send2FACode: user not found");
+        return false;
+    }
+
+    $email = $res->fetch_assoc()['email'];
+
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'alucky0140@gmail.com';
+        $mail->Password   = 'fvts edcz wnmy izgi'; // App password
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
+
+        $mail->setFrom('alucky0140@gmail.com', 'My App - 2FA');
+        $mail->addAddress($email);
+        $mail->isHTML(true);
+        $mail->Subject = 'Your 2FA Verification Code';
+        $mail->Body    = "Your 2FA code is: <strong>$code</strong><br>This code will expire in 5 minutes.";
+        $mail->AltBody = "Your 2FA code is: $code";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer error: " . $mail->ErrorInfo);
+        return false;
+    }
+}
 
 function processRequest($request)
 {
@@ -147,36 +192,34 @@ function processRequest($request)
                 return ["status" => "error", "message" => $mydb->error];
             }
 
-        case "login":
-            $identifier = $request['identifier'];
-            $password = $request['password'];
-
-            // Check if the user exists (by username or email)
-            $sql = "SELECT * FROM users WHERE username='$identifier' OR email='$identifier'";
-            $result = $mydb->query($sql);
-            if ($result->num_rows > 0) {
-                $user = $result->fetch_assoc();
-                if (password_verify($password, $user['password'])) {
-                    // Generate a token and store it
-                    $token = bin2hex(random_bytes(16)); // 32-char hex
-
-                    $insertToken = "INSERT INTO tokens (token, username) VALUES (?, ?)";
-                    $stmtToken = $mydb->prepare($insertToken);
-                    $stmtToken->bind_param("ss", $token, $user['username']);
-                    $stmtToken->execute();
-
-                    return [
-                        "status" => "success",
-                        "message" => "User authenticated.",
-                        "username" => $user['username'],
-                        "token" => $token
-                    ];
-                } else {
-                    return ["status" => "error", "message" => "Invalid password."];
-                }
-            } else {
-                return ["status" => "error", "message" => "User not found."];
-            }
+            case "login":
+                $identifier = $request['identifier'];
+                $password = $request['password'];
+    
+                // Check if the user exists (by username or email)
+                $sql = "SELECT * FROM users WHERE username='$identifier' OR email='$identifier'";
+                $result = $mydb->query($sql);
+                if ($result->num_rows > 0) {
+                    $user = $result->fetch_assoc();
+                    if (password_verify($password, $user['password'])) {
+                        
+                        $code = str_pad(rand(0, 999999), 6, "0", STR_PAD_LEFT);
+                    
+                        $stmtCode = $mydb->prepare("INSERT INTO two_fa_codes (username, code) VALUES (?, ?)");
+                        $stmtCode->bind_param("ss", $user['username'], $code);
+                        $stmtCode->execute();
+                    
+                        send2FACode($user['username'], $code, $mydb);
+                    
+                        return [
+                            "status" => "2fa_required",
+                            "message" => "Verification code sent to your email.",
+                            "username" => $user['username']
+                        ];
+                    }
+                    } else {
+                        return ["status" => "error", "message" => "Invalid password."];
+                    }
 
         case "verifyToken":
             if (!isset($request['token'])) {
@@ -762,6 +805,30 @@ function processRequest($request)
                     return ["status"=>"error","message"=>$mydb->error];
                 }
                 return ["status"=>"success","message"=>"Removed"];
+
+                case "verify2fa":
+                    $username = $request['username'];
+                    $code = $request['code'];
+                
+                    $stmt = $mydb->prepare("SELECT * FROM two_fa_codes WHERE username=? AND code=? AND created_at >= NOW() - INTERVAL 5 MINUTE ORDER BY created_at DESC LIMIT 1");
+                    $stmt->bind_param("ss", $username, $code);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                
+                    if ($result->num_rows > 0) {
+                        $token = bin2hex(random_bytes(16));
+                        $stmt = $mydb->prepare("INSERT INTO tokens (token, username) VALUES (?, ?)");
+                        $stmt->bind_param("ss", $token, $username);
+                        $stmt->execute();
+                
+                        return [
+                            "status" => "success",
+                            "token" => $token,
+                            "message" => "2FA verified"
+                        ];
+                    } else {
+                        return ["status" => "error", "message" => "Invalid or expired code"];
+                    }  
         
             default:
                 return ["status"=>"error","message"=>"Unknown action: {$request['action']}"];
